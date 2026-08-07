@@ -1,0 +1,32 @@
+/* Top Corner User Name */
+.top-corner {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 2;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(5px);
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.top-corner:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Bottom Corner Creator Name (Very Small) */
+.creator-watermark {
+    position: absolute;
+    bottom: 10px;
+    right: 15px;
+    z-index: 2;
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.4); /* Thoda transparent taaki background par acha lage */
+    pointer-events: none; /* Is par click nahi hoga */
+    letter-spacing: 1px;
+}
+
