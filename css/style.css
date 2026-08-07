@@ -1,32 +1,52 @@
-/* Top Corner User Name */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', sans-serif; color: white; overflow-x: hidden; background-color: black; }
+
+/* Video Backgrounds */
+.bg-video {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: cover; z-index: -1;
+}
+.bg-video-blur {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: cover; z-index: -1;
+    filter: blur(12px) brightness(0.6); transform: scale(1.05);
+}
+
+/* Containers & Glass Box */
+.container {
+    position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; 
+    justify-content: center; min-height: 100vh; background: rgba(0, 0, 0, 0.4); padding: 20px;
+}
+.glass-box {
+    background: rgba(255, 255, 255, 0.1); padding: 30px; border-radius: 15px;
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    text-align: center; width: 100%; max-width: 400px;
+    border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* Inputs & Buttons */
+input, textarea, select {
+    width: 100%; padding: 12px; margin: 8px 0; border-radius: 5px; border: none; outline: none;
+    background: rgba(255, 255, 255, 0.9); font-family: inherit;
+}
+button {
+    width: 100%; padding: 12px; margin: 10px 0; background: #007bff; color: white;
+    border: none; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s;
+}
+button:hover { background: #0056b3; }
+.btn-gold { background: gold; color: black; }
+.btn-gold:hover { background: #d4af37; }
+
+/* Corners & Watermark */
 .top-corner {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    z-index: 2;
-    background: rgba(0, 0, 0, 0.6);
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-weight: bold;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(5px);
-    cursor: pointer;
-    transition: 0.3s;
+    position: absolute; top: 20px; right: 20px; z-index: 2; background: rgba(0, 0, 0, 0.6);
+    padding: 10px 20px; border-radius: 8px; font-weight: bold; backdrop-filter: blur(5px);
 }
-
-.top-corner:hover {
-    background: rgba(255, 255, 255, 0.2);
+.sound-toggle-btn {
+    position: absolute; bottom: 20px; left: 20px; z-index: 10; background: rgba(0, 0, 0, 0.6);
+    color: white; border: 1px solid rgba(255, 255, 255, 0.3); padding: 8px 15px; 
+    border-radius: 20px; cursor: pointer; width: auto; font-weight: bold;
 }
-
-/* Bottom Corner Creator Name (Very Small) */
 .creator-watermark {
-    position: absolute;
-    bottom: 10px;
-    right: 15px;
-    z-index: 2;
-    font-size: 10px;
-    color: rgba(255, 255, 255, 0.4); /* Thoda transparent taaki background par acha lage */
-    pointer-events: none; /* Is par click nahi hoga */
-    letter-spacing: 1px;
+    position: absolute; bottom: 10px; right: 15px; z-index: 2; font-size: 10px;
+    color: rgba(255, 255, 255, 0.4); pointer-events: none; letter-spacing: 1px;
 }
-
+.center-profile { width: 130px; height: 130px; border-radius: 15px; border: 3px solid white; object-fit: cover; margin-bottom: 15px; }
