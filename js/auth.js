@@ -30,27 +30,38 @@ if (authBtn) {
 
 if (logoutBtn) logoutBtn.addEventListener('click', () => signOut(auth));
 
+// Check URL for short username parameter (e.g. index.html?u=username)
 const urlParams = new URLSearchParams(window.location.search);
-const profileViewUid = urlParams.get('user');
+const profileUsername = urlParams.get('u');
 
 onAuthStateChanged(auth, async (user) => {
     const authSec = document.getElementById('auth-section');
     const mainSec = document.getElementById('main-screen');
     const topNav = document.getElementById('top-nav');
 
-    if (profileViewUid) {
-        if (!user) {
-            authSec.style.display = 'block';
-            mainSec.style.display = 'none';
-            if(topNav) topNav.style.display = 'none';
-            return;
+    if (profileUsername) {
+        // Username se target UID nikalna
+        const uRef = await get(child(ref(db), `usernames/${profileUsername}`));
+        if (uRef.exists()) {
+            const targetUid = uRef.val();
+            if (!user) {
+                authSec.style.display = 'block';
+                mainSec.style.display = 'none';
+                if(topNav) topNav.style.display = 'none';
+                return;
+            } else {
+                authSec.style.display = 'none';
+                mainSec.style.display = 'block';
+                if(topNav) topNav.style.display = 'none';
+                document.getElementById('back-my-profile').style.display = 'block';
+                loadProfileData(targetUid);
+                // YAHAN HUM USER KI UID BHEJ RAHE HAIN UNIQUE VIEW CHECK KE LIYE
+                incrementViews(targetUid, user.uid); 
+                return;
+            }
         } else {
-            authSec.style.display = 'none';
-            mainSec.style.display = 'block';
-            if(topNav) topNav.style.display = 'none';
-            document.getElementById('back-my-profile').style.display = 'block';
-            loadProfileData(profileViewUid);
-            incrementViews(profileViewUid);
+            alert("Profile not found!");
+            window.location.href = "index.html";
             return;
         }
     }
@@ -85,7 +96,6 @@ async function loadProfileData(targetUid) {
             if(document.getElementById('corner-img')) document.getElementById('corner-img').src = data.profilePhoto;
         }
         
-        // 1. Main Play Button Setup
         const mainPlayBox = document.getElementById('main-play-box');
         window.mainMusicLink = data.mainMusicLink || null;
         if (window.mainMusicLink) {
@@ -94,7 +104,6 @@ async function loadProfileData(targetUid) {
             mainPlayBox.style.display = 'none';
         }
 
-        // 2. Playlists Setup (Playlist 1, 2, 3)
         const playlistBox = document.getElementById('music-playlist-container');
         const playlistContainer = document.getElementById('playlist-tracks');
         const songs = [data.music1, data.music2, data.music3].filter(link => link && link.trim() !== "");
@@ -122,7 +131,6 @@ async function loadProfileData(targetUid) {
             playlistBox.style.display = 'none';
         }
         
-        // 3. Social Handles Setup
         const socialContainer = document.getElementById('social-buttons-container');
         socialContainer.innerHTML = "";
         let hasSocials = false;
@@ -141,7 +149,7 @@ async function loadProfileData(targetUid) {
     }
 }
 
-// Independent Play Button Logic (30s Spotify / Full YouTube)
+// Independent Play Button Logic
 const playBtn = document.getElementById('play-pause-btn');
 const embedContainer = document.getElementById('embedded-player-container');
 let isPlaying = false;
@@ -179,11 +187,27 @@ if (playBtn) {
     });
 }
 
-async function incrementViews(targetUid) {
-    const viewRef = child(ref(db), `users/${targetUid}/profileViews`);
-    const snap = await get(viewRef);
-    let currentViews = snap.exists() ? snap.val() : 0;
-    await update(ref(db, `users/${targetUid}`), { profileViews: currentViews + 1 });
+// -----------------------------------------------------
+// 🚀 UNIQUE PROFILE VIEWS LOGIC (FIXED)
+// -----------------------------------------------------
+async function incrementViews(targetUid, viewerUid) {
+    // Agar khud ki profile dekh raha hai, toh view mat badhao
+    if (!viewerUid || targetUid === viewerUid) return; 
+
+    // Check karo ki kya is user ne pehle se dekha hai?
+    const viewerRef = child(ref(db), `users/${targetUid}/viewedBy/${viewerUid}`);
+    const snap = await get(viewerRef);
+
+    if (!snap.exists()) {
+        // Agar pehli baar dekh raha hai, toh database me record save karo
+        await set(viewerRef, true);
+        
+        // Aur tab views ko +1 karo
+        const viewRef = child(ref(db), `users/${targetUid}/profileViews`);
+        const viewSnap = await get(viewRef);
+        let currentViews = viewSnap.exists() ? viewSnap.val() : 0;
+        await update(ref(db, `users/${targetUid}`), { profileViews: currentViews + 1 });
+    }
 }
 
 async function loadViewsCount(targetUid) {
@@ -192,14 +216,23 @@ async function loadViewsCount(targetUid) {
     if(document.getElementById('views-count')) document.getElementById('views-count').innerText = count;
 }
 
+// Updated Share Button (Generates short ?u=username link)
 const shareBtn = document.getElementById('share-profile-btn');
 if(shareBtn) {
-    shareBtn.addEventListener('click', () => {
+    shareBtn.addEventListener('click', async () => {
         const user = auth.currentUser;
         if(user) {
-            const shareUrl = window.location.origin + window.location.pathname + "?user=" + user.uid;
+            const userSnap = await get(child(ref(db), `users/${user.uid}/username`));
+            const username = userSnap.exists() ? userSnap.val() : "";
+            
+            if(!username) {
+                alert("Please set a username in Edit Profile first!");
+                return;
+            }
+
+            const shareUrl = window.location.origin + window.location.pathname + "?u=" + username;
             navigator.clipboard.writeText(shareUrl);
-            alert("Profile link copied!");
+            alert("Short profile link copied: " + shareUrl);
         }
     });
 }
