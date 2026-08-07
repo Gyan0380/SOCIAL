@@ -28,52 +28,91 @@ if (authBtn) {
     });
 }
 
-if (logoutBtn) {
-    logoutBtn.addEventListener('click', () => signOut(auth));
-}
+if (logoutBtn) logoutBtn.addEventListener('click', () => signOut(auth));
 
-// Global UI State
+// Check URL if someone opened a shared profile link (e.g. index.html?user=UID)
+const urlParams = new URLSearchParams(window.location.search);
+const profileViewUid = urlParams.get('user');
+
 onAuthStateChanged(auth, async (user) => {
     const authSec = document.getElementById('auth-section');
     const mainSec = document.getElementById('main-screen');
     const topNav = document.getElementById('top-nav');
 
+    if (profileViewUid) {
+        // VIEWING SOMEONE ELSE'S PROFILE VIA SHARE LINK
+        authSec.style.display = 'none';
+        mainSec.style.display = 'block';
+        if(topNav) topNav.style.display = 'none'; // hide own menu
+        document.getElementById('back-my-profile').style.display = 'block';
+
+        loadProfileData(profileViewUid);
+        return;
+    }
+
     if (user) {
-        if (authSec) authSec.style.display = 'none';
-        if (mainSec) mainSec.style.display = 'block';
-        if (topNav) topNav.style.display = 'flex';
+        authSec.style.display = 'none';
+        mainSec.style.display = 'block';
+        if(topNav) topNav.style.display = 'flex';
         
-        const snapshot = await get(child(ref(db), `users/${user.uid}`));
-        if (snapshot.exists()) {
-            const data = snapshot.val();
-            
-            // Set Usernames and Photos
-            if (document.getElementById('main-username')) document.getElementById('main-username').innerText = (data.isPremium ? "⭐ @" : "@") + (data.username || "username");
-            if (document.getElementById('main-profile-img') && data.profilePhoto) document.getElementById('main-profile-img').src = data.profilePhoto;
-            if (document.getElementById('corner-img') && data.profilePhoto) document.getElementById('corner-img').src = data.profilePhoto;
-            
-            // Set Song Info
-            if (document.getElementById('display-song-name')) {
-                document.getElementById('display-song-name').innerText = data.songName || "No song added";
-            }
-            window.userMusicLink = data.spotifyLink || null; // Store for player
-            
-            // Set Notifications in Main Page
-            if (data.notifications && document.getElementById('main-noti-list')) {
-                document.getElementById('noti-count').style.display = 'inline-block';
-                const notiList = document.getElementById('main-noti-list');
-                notiList.innerHTML = '';
-                Object.values(data.notifications).forEach(n => {
-                    notiList.innerHTML += `<li style="margin-bottom:5px; border-bottom:1px solid #444; padding-bottom:5px;">${n.message}</li>`;
-                });
-            }
-        }
+        loadProfileData(user.uid);
     } else {
-        if (authSec) authSec.style.display = 'block';
-        if (mainSec) mainSec.style.display = 'none';
-        if (topNav) topNav.style.display = 'none';
+        authSec.style.display = 'block';
+        mainSec.style.display = 'none';
+        if(topNav) topNav.style.display = 'none';
     }
 });
+
+async function loadProfileData(targetUid) {
+    const snapshot = await get(child(ref(db), `users/${targetUid}`));
+    if (snapshot.exists()) {
+        const data = snapshot.val();
+        
+        document.getElementById('main-username').innerText = (data.isPremium ? "⭐ @" : "@") + (data.username || "user");
+        if(data.fullname) document.getElementById('main-bio').innerText = data.fullname + " | " + (data.bio || "");
+        
+        if (data.profilePhoto) {
+            document.getElementById('main-profile-img').src = data.profilePhoto;
+            if(document.getElementById('corner-img')) document.getElementById('corner-img').src = data.profilePhoto;
+        }
+        
+        if (data.songName) {
+            document.getElementById('display-song-name').innerText = data.songName;
+        }
+        
+        // Setup Social Handles dynamically
+        const socialContainer = document.getElementById('social-buttons-container');
+        socialContainer.innerHTML = "";
+        
+        if (data.instaLink) {
+            socialContainer.innerHTML += `<a href="https://instagram.com/${data.instaLink}" target="_blank" style="background: #e1306c; color: white; padding: 6px 15px; border-radius: 15px; font-size: 12px; text-decoration: none; font-weight: bold;">Instagram</a>`;
+        }
+        if (data.ytLink) {
+            socialContainer.innerHTML += `<a href="${data.ytLink}" target="_blank" style="background: #ff0000; color: white; padding: 6px 15px; border-radius: 15px; font-size: 12px; text-decoration: none; font-weight: bold;">YouTube</a>`;
+        }
+
+        window.currentMusicLink = data.spotifyLink || null;
+        
+        // Spotify Direct Button check
+        if (window.currentMusicLink && window.currentMusicLink.includes("spotify.com")) {
+            document.getElementById('spotify-redirect-container').style.display = 'block';
+            document.getElementById('spotify-direct-link').href = window.currentMusicLink;
+        }
+    }
+}
+
+// Share Profile Button Logic
+const shareBtn = document.getElementById('share-profile-btn');
+if(shareBtn) {
+    shareBtn.addEventListener('click', () => {
+        const user = auth.currentUser;
+        if(user) {
+            const shareUrl = window.location.origin + window.location.pathname + "?user=" + user.uid;
+            navigator.clipboard.writeText(shareUrl);
+            alert("Profile link copied to clipboard! Share it with your friends.");
+        }
+    });
+}
 
 // Sound Toggle
 const soundBtn = document.getElementById('sound-toggle');
@@ -82,11 +121,10 @@ if (soundBtn && bgVideo) {
     soundBtn.addEventListener('click', () => {
         bgVideo.muted = !bgVideo.muted;
         soundBtn.innerText = bgVideo.muted ? "🔇 Sound OFF" : "🔊 Sound ON";
-        soundBtn.style.background = bgVideo.muted ? "rgba(0, 0, 0, 0.6)" : "rgba(0, 123, 255, 0.6)";
     });
 }
 
-// Corner Menu Dropdown Logic
+// Menu Dropdown
 const cornerImg = document.getElementById('corner-img');
 const dropdownMenu = document.getElementById('dropdown-menu');
 if (cornerImg && dropdownMenu) {
@@ -95,49 +133,48 @@ if (cornerImg && dropdownMenu) {
     });
 }
 
-// Notification Bell Logic
-const notiBell = document.getElementById('noti-bell-btn');
-const notiDropdown = document.getElementById('noti-dropdown');
-if(notiBell && notiDropdown) {
-    notiBell.addEventListener('click', () => {
-        notiDropdown.style.display = notiDropdown.style.display === 'none' ? 'block' : 'none';
-        document.getElementById('noti-count').style.display = 'none';
-    });
-}
-
-// Music Player Simulate Logic
+// -----------------------------------------------------
+// Smart Player (30s limit for Spotify, Full for YouTube)
+// -----------------------------------------------------
 const playBtn = document.getElementById('play-pause-btn');
-const progressFill = document.getElementById('music-progress');
-const currentTimeText = document.getElementById('current-time');
+const embedContainer = document.getElementById('embedded-player-container');
 let isPlaying = false;
-let musicInterval;
 
 if (playBtn) {
     playBtn.addEventListener('click', () => {
-        if (!window.userMusicLink) {
-            alert("No music link set! Update in Edit Profile.");
+        if (!window.currentMusicLink) {
+            alert("No music link provided by this user.");
             return;
         }
 
-        if (!isPlaying) {
-            playBtn.innerText = "⏸"; 
-            isPlaying = true;
-            window.open(window.userMusicLink, '_blank'); 
+        let link = window.currentMusicLink;
+        embedContainer.innerHTML = "";
 
-            let seconds = 0;
-            musicInterval = setInterval(() => {
-                seconds++;
-                let min = Math.floor(seconds / 60);
-                let sec = seconds % 60;
-                currentTimeText.innerText = `${min}:${sec < 10 ? '0' : ''}${sec}`;
-                progressFill.style.width = `${(seconds / 180) * 100}%`;
-                if(seconds >= 180) clearInterval(musicInterval);
-            }, 1000);
-            
+        if (!isPlaying) {
+            playBtn.innerText = "⏸";
+            isPlaying = true;
+
+            if (link.includes("youtube.com") || link.includes("youtu.be")) {
+                let videoId = link.includes('v=') ? link.split('v=')[1].split('&')[0] : link.split('youtu.be/')[1].split('?')[0];
+                embedContainer.innerHTML = `<iframe width="0" height="0" src="https://www.youtube.com/embed/${videoId}?autoplay=1" frameborder="0" allow="autoplay"></iframe>`;
+            } 
+            else if (link.includes("spotify.com")) {
+                let trackId = link.split('track/')[1].split('?')[0];
+                // Embed Spotify widget
+                embedContainer.innerHTML = `<iframe style="border-radius:12px; margin-top:10px;" src="https://open.spotify.com/embed/track/${trackId}?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allow="autoplay"></iframe>`;
+                
+                // Stop audio automatically after 30 seconds as requested
+                setTimeout(() => {
+                    embedContainer.innerHTML = "";
+                    playBtn.innerText = "▶";
+                    isPlaying = false;
+                    alert("Spotify preview ended (30s limit). Click 'Play full song on Spotify' to listen completely!");
+                }, 30000);
+            }
         } else {
-            playBtn.innerText = "▶"; 
+            playBtn.innerText = "▶";
             isPlaying = false;
-            clearInterval(musicInterval);
+            embedContainer.innerHTML = "";
         }
     });
 }
