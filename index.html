@@ -7,21 +7,43 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <!-- Background Video (Default anime video) -->
+    <!-- Background Video -->
     <video autoplay loop muted id="main-bg-video" class="bg-video">
         <source src="anime-video.mp4" type="video/mp4">
     </video>
 
-    <!-- Top Corner Profile Name -->
-    <div id="corner-profile" class="top-corner" style="display: none;">
-        <span id="user-display-name">Username</span>
+    <!-- Top Corner Nav (Notification + Profile) -->
+    <div class="top-nav" id="top-nav" style="display: none;">
+        <!-- Notification Bell -->
+        <div class="noti-bell" id="noti-bell-btn">
+            🔔<span class="noti-badge" id="noti-count" style="display:none;">1</span>
+            
+            <!-- Notifications Dropdown -->
+            <div id="noti-dropdown" class="glass-box" style="display: none; position: absolute; right: 60px; top: 10px; width: 250px; padding: 15px; text-align: left; z-index: 20;">
+                <h4 style="margin-bottom: 10px; border-bottom: 1px solid gray; padding-bottom: 5px;">Notifications</h4>
+                <ul id="main-noti-list" style="list-style: none; font-size: 12px; color: #ddd;">
+                    <li>No new notifications</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Corner Profile Menu -->
+        <div id="corner-profile" style="position: relative;">
+            <img id="corner-img" src="default-profile.png" style="width: 45px; height: 45px; border-radius: 50%; border: 2px solid white; cursor: pointer; object-fit: cover;">
+            
+            <!-- Dropdown Menu -->
+            <div id="dropdown-menu" style="display: none; position: absolute; top: 55px; right: 0; background: rgba(0,0,0,0.9); padding: 10px; border-radius: 8px; width: 130px; border: 1px solid rgba(255,255,255,0.2);">
+                <button onclick="window.location.href='profile.html'" style="padding: 8px; font-size: 13px; margin-bottom: 5px;">✏️ Edit Profile</button>
+                <button id="logout-btn" style="background: #ff4757; padding: 8px; font-size: 13px;">🚪 Logout</button>
+            </div>
+        </div>
     </div>
 
-    <!-- Sound Toggle Button -->
+    <!-- Sound Button -->
     <button id="sound-toggle" class="sound-toggle-btn">🔇 Sound OFF</button>
 
     <div class="container">
-        <!-- Login/Signup Section -->
+        <!-- Auth Section -->
         <div id="auth-section" class="glass-box">
             <h2 id="form-title">Sign In</h2>
             <input type="email" id="email" placeholder="Enter Email" required>
@@ -34,18 +56,29 @@
         </div>
 
         <!-- Main Screen -->
-        <div id="main-screen" class="glass-box" style="display: none;">
-            <img id="main-profile-img" src="default-profile.png" class="center-profile" alt="Profile">
-            <h2 id="main-username" style="margin-bottom: 10px;">@username</h2>
+        <div id="main-screen" style="display: none; width: 100%; max-width: 400px; text-align: center;">
             
-            <div class="music-player">
-                <button id="play-btn">▶ Play Music</button>
+            <!-- Separated Profile Display -->
+            <div style="margin-bottom: 20px;">
+                <img id="main-profile-img" src="default-profile.png" style="width: 150px; height: 150px; border-radius: 15px; border: 3px solid white; object-fit: cover; box-shadow: 0 0 20px rgba(0,0,0,0.6);">
+                <h2 id="main-username" style="margin-top: 15px; text-shadow: 2px 2px 5px black;">@username</h2>
+            </div>
+
+            <!-- Custom Music Player -->
+            <div class="music-container">
+                <button id="play-pause-btn" class="play-pause-btn">▶</button>
+                <div class="song-info-box">
+                    <div class="song-name-text" id="display-song-name">Song Name Here</div>
+                    <div class="waveform-progress">
+                        <div class="waveform-fill" id="music-progress"></div>
+                    </div>
+                    <div class="music-time">
+                        <span id="current-time">0:00</span>
+                        <span id="total-time">3:00</span>
+                    </div>
+                </div>
             </div>
             
-            <div style="display: flex; gap: 10px; margin-top: 15px;">
-                <button onclick="window.location.href='profile.html'">Edit Profile</button>
-                <button id="logout-btn" style="background-color: #ff4757;">Logout</button>
-            </div>
         </div>
     </div>
 
