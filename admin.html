@@ -2,36 +2,42 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Admin - Developer Gyan</title>
-    <style>
-        body { font-family: Arial; background: #f4f4f4; padding: 20px; }
-        .admin-card { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .user-item { border-left: 4px solid #007bff; padding: 10px; margin-bottom: 10px; background: #f9f9f9; display: flex; justify-content: space-between; }
-        button { padding: 5px 10px; cursor: pointer; color: white; border: none; border-radius: 3px; margin-left: 5px; }
-        .bg-green { background: #28a745; } .bg-red { background: #dc3545; } .bg-blue { background: #007bff; }
-    </style>
+    <title>My Profile - Setup</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <h1>Admin Control Panel</h1>
-    
-    <div class="admin-card">
-        <h3>📢 Send Global Notification</h3>
-        <input type="text" id="admin-msg" placeholder="Type message..." style="width: 70%; padding: 8px;">
-        <button id="send-btn" class="bg-blue">Send</button>
-    </div>
+    <video autoplay loop muted id="profile-bg-video" class="bg-video-blur">
+        <source src="anime-video.mp4" type="video/mp4">
+    </video>
 
-    <div class="admin-card">
-        <h3>⏳ Pending UPI Requests</h3>
-        <div id="pending-list"></div>
-    </div>
+    <div class="container">
+        <div class="glass-box" style="max-height: 90vh; overflow-y: auto;">
+            <h2>Account Setup</h2>
 
-    <div class="admin-card">
-        <h3>⭐ Active Premium Users</h3>
-        <div id="premium-list"></div>
+            <img id="preview-img" src="default-profile.png" class="center-profile" style="width: 100px; height: 100px;">
+            <input type="file" id="profile-upload" accept="image/*">
+            <input type="text" id="username" placeholder="Choose unique username">
+            <input type="text" id="fullname" placeholder="Full Name">
+            <input type="text" id="bio" placeholder="Bio">
+            
+            <hr style="margin: 20px 0; border-color: rgba(255,255,255,0.2);">
+            <h3 style="font-size: 14px; margin-bottom: 10px; text-align: left;">🎵 Music Playlist (Max 3 Links)</h3>
+            <p style="font-size: 11px; color: #ffeb3b; text-align: left; margin-bottom: 8px;">Paste YouTube or Spotify links. Spotify will have a direct redirect/preview button.</p>
+
+            <input type="text" id="music-1" placeholder="Song 1 Link (YT / Spotify)">
+            <input type="text" id="music-2" placeholder="Song 2 Link (Optional)">
+            <input type="text" id="music-3" placeholder="Song 3 Link (Optional)">
+
+            <h3 style="font-size: 14px; margin: 15px 0 10px 0; text-align: left;">🌐 Social Handles</h3>
+            <input type="text" id="ig-link" placeholder="Instagram Username">
+            <input type="text" id="yt-link" placeholder="YouTube Channel Link">
+            
+            <button id="save-profile-btn" style="margin-top: 20px;">Save Profile</button>
+            <button onclick="window.location.href='index.html'" style="background: #555;">Back to Home</button>
+        </div>
     </div>
 
     <script type="module" src="js/firebase.js"></script>
-    <script type="module" src="js/admin.js"></script>
+    <script type="module" src="js/app.js"></script>
 </body>
 </html>
-
