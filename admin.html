@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="admin-container" style="background: white; color: black; padding: 20px;">
+        <h2>Admin Dashboard</h2>
+        
+        <!-- Broadcast Notification Section -->
+        <div class="broadcast-section">
+            <h3>Send Notification</h3>
+            <textarea id="admin-message" placeholder="Type new update..."></textarea>
+            <select id="target-audience">
+                <option value="all">All Users</option>
+                <option value="premium">Premium Users Only</option>
+            </select>
+            <button id="send-noti-btn">Send Notification</button>
+        </div>
+
+        <!-- Pending Payments Section -->
+        <div class="payments-section">
+            <h3>Pending UPI Payments</h3>
+            <div id="pending-list">
+                <!-- Data will load here from database -->
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/firebase.js"></script>
+    <script type="module" src="js/admin.js"></script>
+</body>
+</html>
+
