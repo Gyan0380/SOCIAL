@@ -1,74 +1,65 @@
-import { db } from './firebase.js';
-import { ref, onValue, update, push, set } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
+import { auth, db } from './firebase.js';
+import { ref, get, set, push, child, remove, update } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
 
-window.acceptPay = acceptPay;
-window.denyPay = denyPay;
-window.revoke = revoke;
+const loginOverlay = document.getElementById('login-overlay');
+const adminPanel = document.getElementById('admin-panel');
+const adminPassInput = document.getElementById('admin-pass');
 
-// Fetch Data Realtime
-onValue(ref(db, 'users'), (snapshot) => {
-    const pendList = document.getElementById('pending-list');
-    const premList = document.getElementById('premium-list');
-    pendList.innerHTML = ''; premList.innerHTML = '';
-
-    if (snapshot.exists()) {
-        for (const [uid, data] of Object.entries(snapshot.val())) {
-            
-            // Pending Payments
-            if (data.paymentPending) {
-                pendList.innerHTML += `
-                <div class="user-item">
-                    <div><b>${data.username}</b> | UPI: ${data.paymentUpiId}</div>
-                    <div>
-                        <button class="bg-green" onclick="acceptPay('${uid}')">Accept (20 Days)</button>
-                        <button class="bg-red" onclick="denyPay('${uid}')">Deny</button>
-                    </div>
-                </div>`;
-            }
-
-            // Premium Users
-            if (data.isPremium) {
-                const exp = new Date(data.premiumExpiry).toLocaleDateString();
-                premList.innerHTML += `
-                <div class="user-item" style="border-left-color: gold;">
-                    <div><b>⭐ ${data.username}</b> | Expires: ${exp}</div>
-                    <div><button class="bg-red" onclick="revoke('${uid}')">Revoke</button></div>
-                </div>`;
-            }
-        }
+// 1. Password Verification (Password Firebase ke 'admin_config' node mein store hoga)
+document.getElementById('login-btn').addEventListener('click', async () => {
+    const pass = adminPassInput.value;
+    const snap = await get(child(ref(db), 'admin_config/password'));
+    
+    if(snap.exists() && snap.val() === pass) {
+        loginOverlay.style.display = 'none';
+        adminPanel.style.display = 'block';
+        loadActiveItems();
+    } else {
+        alert("Wrong Password!");
     }
 });
 
-// Admin Functions
-async function acceptPay(uid) {
-    if(!confirm("Accept 20 Days Premium?")) return;
-    await update(ref(db, `users/${uid}`), {
-        isPremium: true, isSuspended: false, paymentPending: null, paymentUpiId: null,
-        premiumExpiry: Date.now() + (20 * 24 * 60 * 60 * 1000) // +20 Days
+// 2. Add New Store Item
+document.getElementById('add-item-btn').addEventListener('click', async () => {
+    const name = document.getElementById('offer-name').value;
+    const desc = document.getElementById('offer-desc').value;
+    const price = document.getElementById('offer-price').value;
+    const code = document.getElementById('offer-coupon').value;
+
+    if(!name || !price || !code) return alert("Fill all fields!");
+
+    const storeRef = push(ref(db, 'store'));
+    await set(storeRef, {
+        offerName: name,
+        offerDesc: desc,
+        price: parseInt(price),
+        secretCode: code,
+        isActive: true
     });
-    pushNoti(uid, "Your premium is accepted! You got 20 days premium access.");
-}
-
-async function denyPay(uid) {
-    await update(ref(db, `users/${uid}`), { paymentPending: null, paymentUpiId: null });
-    pushNoti(uid, "Your payment was denied.");
-}
-
-async function revoke(uid) {
-    if(!confirm("Revoke premium?")) return;
-    await update(ref(db, `users/${uid}`), { isPremium: false, premiumExpiry: null });
-    pushNoti(uid, "Your premium subscription was revoked by Admin.");
-}
-
-function pushNoti(uid, msg) {
-    set(push(ref(db, `users/${uid}/notifications`)), { message: msg, timestamp: Date.now() });
-}
-
-// Global Notification
-document.getElementById('send-btn').addEventListener('click', () => {
-    const msg = document.getElementById('admin-msg').value;
-    if(msg) {
-        set(push(ref(db, 'global_notifications')), { message: msg, timestamp: Date.now() });
-        alert("Sent!"); document.getElementById('admin-msg').value = "";
-    }
+    alert("Item Added!");
+    loadActiveItems();
 });
+
+// 3. Load Active Items for Admin to Manage
+async function loadActiveItems() {
+    const listDiv = document.getElementById('active-items-list');
+    listDiv.innerHTML = '';
+    const snap = await get(child(ref(db), 'store'));
+    if(snap.exists()) {
+        snap.forEach(s => {
+            let item = s.val();
+            if(item.isActive) {
+                listDiv.innerHTML += `
+                    <div style="background:rgba(255,255,255,0.1); padding:10px; margin-bottom:5px; border-radius:5px;">
+                        ${item.offerName} (${item.price} Coins) 
+                        <button onclick="removeItem('${s.key}')" style="background:#ff4757; padding:2px 5px; font-size:10px;">Remove</button>
+                    </div>`;
+            }
+        });
+    }
+}
+
+window.removeItem = async (id) => {
+    await update(ref(db, `store/${id}`), { isActive: false });
+    loadActiveItems();
+};
