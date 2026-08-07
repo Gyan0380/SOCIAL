@@ -1,5 +1,5 @@
 import { auth, db } from './firebase.js';
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
 import { ref, set, get, update, child } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
 
 const profileUpload = document.getElementById('profile-upload');
@@ -32,8 +32,9 @@ function loadExistingProfile(uid) {
             document.getElementById('fullname').value = data.fullname || "";
             document.getElementById('bio').value = data.bio || "";
             
-            if (document.getElementById('song-name-input')) document.getElementById('song-name-input').value = data.songName || "";
-            if (document.getElementById('music-link-input')) document.getElementById('music-link-input').value = data.spotifyLink || "";
+            if (document.getElementById('music-1')) document.getElementById('music-1').value = data.music1 || "";
+            if (document.getElementById('music-2')) document.getElementById('music-2').value = data.music2 || "";
+            if (document.getElementById('music-3')) document.getElementById('music-3').value = data.music3 || "";
             if (document.getElementById('ig-link')) document.getElementById('ig-link').value = data.instaLink || "";
             if (document.getElementById('yt-link')) document.getElementById('yt-link').value = data.ytLink || "";
 
@@ -58,8 +59,9 @@ if (saveBtn) {
             username: username,
             fullname: document.getElementById('fullname').value,
             bio: document.getElementById('bio').value,
-            songName: document.getElementById('song-name-input').value.trim(),
-            spotifyLink: document.getElementById('music-link-input').value.trim(),
+            music1: document.getElementById('music-1').value.trim(),
+            music2: document.getElementById('music-2').value.trim(),
+            music3: document.getElementById('music-3').value.trim(),
             instaLink: document.getElementById('ig-link').value.trim(),
             ytLink: document.getElementById('yt-link').value.trim(),
             profilePhoto: base64String
