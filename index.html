@@ -3,57 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Social Profile Web</title>
+    <title>Developer Gyan - Digital Store</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <!-- Background Entry Video -->
-    <video autoplay loop muted class="bg-video">
-        <source src="your-video-link.mp4" type="video/mp4">
+    <!-- Background Video (Default anime video) -->
+    <video autoplay loop muted id="main-bg-video" class="bg-video">
+        <source src="anime-video.mp4" type="video/mp4">
     </video>
 
-    <!-- Top Corner User Profile (Hidden by default) -->
+    <!-- Top Corner Profile Name -->
     <div id="corner-profile" class="top-corner" style="display: none;">
         <span id="user-display-name">Username</span>
     </div>
 
+    <!-- Sound Toggle Button -->
+    <button id="sound-toggle" class="sound-toggle-btn">🔇 Sound OFF</button>
+
     <div class="container">
-        <!-- Auth Section (Login/Register) -->
+        <!-- Login/Signup Section -->
         <div id="auth-section" class="glass-box">
             <h2 id="form-title">Sign In</h2>
             <input type="email" id="email" placeholder="Enter Email" required>
             <input type="password" id="password" placeholder="Enter Password" required>
             <button id="auth-btn">Sign In</button>
-            <p id="toggle-text">Don't have an account? <br> <span id="toggle-link">Create New Account</span></p>
+            <p style="margin-top:15px; font-size:14px;">
+                Don't have an account? <br>
+                <span id="toggle-link" style="color:#4da3ff; cursor:pointer; font-weight:bold;">Create New Account</span>
+            </p>
         </div>
 
         <!-- Main Screen -->
         <div id="main-screen" class="glass-box" style="display: none;">
-            <!-- Square Profile Photo -->
-            <img src="default-profile.png" class="center-profile" alt="Profile">
+            <img id="main-profile-img" src="default-profile.png" class="center-profile" alt="Profile">
+            <h2 id="main-username" style="margin-bottom: 10px;">@username</h2>
             
-            <!-- Music Player -->
             <div class="music-player">
                 <button id="play-btn">▶ Play Music</button>
-                <span id="music-timer" style="display: block; margin-top: 10px;">00:00 / 00:00</span>
             </div>
             
-            <!-- Action Buttons -->
-            <div class="action-buttons">
-                <button onclick="window.location.href='profile.html'">My Profile</button>
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button onclick="window.location.href='profile.html'">Edit Profile</button>
                 <button id="logout-btn" style="background-color: #ff4757;">Logout</button>
             </div>
         </div>
     </div>
 
-    <!-- Bottom Corner Creator Watermark -->
-    <div class="creator-watermark">
-        web created by GYAN GUPTA
-    </div>
+    <div class="creator-watermark">web created by GYAN GUPTA</div>
 
-    <!-- JavaScript Files -->
     <script type="module" src="js/firebase.js"></script>
     <script type="module" src="js/auth.js"></script>
 </body>
 </html>
-
