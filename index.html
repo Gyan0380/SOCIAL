@@ -21,7 +21,6 @@
             <div id="dropdown-menu" style="display: none; position: absolute; top: 50px; right: 0; background: rgba(0,0,0,0.9); padding: 10px; border-radius: 8px; width: 150px; border: 1px solid rgba(255,255,255,0.2);">
                 <button onclick="window.location.href='profile.html'" style="padding: 6px; font-size: 12px; margin-bottom: 5px;">✏️ Edit Profile</button>
                 <button id="open-friends-menu" style="background: #1e90ff; padding: 6px; font-size: 12px; margin-bottom: 5px;">👥 Friends Menu</button>
-                <!-- NEW GAMES BUTTON ADDED HERE -->
                 <button id="open-games-modal" style="background: #9b59b6; padding: 6px; font-size: 12px; margin-bottom: 5px;">🎮 Games</button>
                 <button onclick="window.location.href='admin.html'" style="background: #f39c12; padding: 6px; font-size: 12px; margin-bottom: 5px;">⚙️ Admin</button>
                 <button id="logout-btn" style="background: #ff4757; padding: 6px; font-size: 12px;">🚪 Logout</button>
@@ -86,24 +85,88 @@
             </div>
         </div>
 
-        <!-- NEW GAMES MODAL ADDED HERE -->
-        <div id="games-modal" class="glass-box" style="display: none; position: absolute; top: 70px; width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto; z-index: 60; text-align: left;">
+        <!-- ======================================= -->
+        <!-- 1. GAMES HUB MODAL (MAIN MENU) -->
+        <!-- ======================================= -->
+        <div id="games-hub-modal" class="glass-box" style="display: none; position: absolute; top: 70px; width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto; z-index: 60; text-align: left;">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px; margin-bottom: 10px;">
-                <h3 style="font-size: 15px; margin:0;">🧠 Code Guess Game</h3>
-                <button id="close-games-modal" style="width: auto; padding: 2px 8px; background: #ff4757; font-size: 11px; margin:0;">X</button>
+                <h3 style="font-size: 15px; margin:0;">🎮 Games Center</h3>
+                <button id="close-games-hub" style="width: auto; padding: 2px 8px; background: #ff4757; font-size: 11px; margin:0;">X</button>
             </div>
             
-            <label style="font-size: 11px; color:#aaa; margin-bottom: 5px; display: block;">Select Difficulty:</label>
-            <select id="game-difficulty" style="background: rgba(0,0,0,0.5); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 8px; font-size: 12px; border-radius: 8px; margin-bottom: 10px; width: 100%;">
-                <option value="easy" style="color: black;">Easy (4 Colors - 7 Guesses)</option>
-                <option value="normal" style="color: black;">Normal (5 Colors - 12 Guesses)</option>
-                <option value="hard" style="color: black;">Hard (6 Colors - 15 Guesses)</option>
-            </select>
+            <p style="font-size: 11px; color: #aaa; margin-bottom: 15px;">Select a game to play:</p>
             
-            <button id="start-game-btn" style="background: #1db954; font-size: 12px; padding: 8px;">Start Game</button>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <!-- Code Guess Game Button -->
+                <button id="btn-open-code-guess" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); padding: 10px; border-radius: 12px; display: flex; align-items: center; gap: 12px; text-align: left;">
+                    <span style="font-size: 24px;">🧠</span> 
+                    <div style="flex-grow: 1;">
+                        <div style="font-size: 14px; font-weight: bold; color: #1db954;">Code Guess</div>
+                        <div style="font-size: 10px; color: #ddd; font-weight: normal; line-height: 1.2;">Crack the secret color code!</div>
+                    </div>
+                </button>
+                
+                <!-- Future Game Placeholder -->
+                <button disabled style="background: rgba(0,0,0,0.4); border: 1px dashed rgba(255,255,255,0.2); padding: 10px; border-radius: 12px; display: flex; align-items: center; gap: 12px; text-align: left; opacity: 0.6; cursor: not-allowed;">
+                    <span style="font-size: 24px;">🚧</span> 
+                    <div style="flex-grow: 1;">
+                        <div style="font-size: 14px; font-weight: bold; color: #aaa;">Coming Soon...</div>
+                        <div style="font-size: 10px; color: #888; font-weight: normal; line-height: 1.2;">More games in next update</div>
+                    </div>
+                </button>
+            </div>
+        </div>
+
+        <!-- ======================================= -->
+        <!-- 2. CODE GUESS GAME MODAL -->
+        <!-- ======================================= -->
+        <div id="code-guess-modal" class="glass-box" style="display: none; position: absolute; top: 70px; width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto; z-index: 61; text-align: left;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px; margin-bottom: 10px;">
+                <h3 style="font-size: 15px; margin:0;">🧠 Code Guess</h3>
+                <button id="back-to-hub" style="width: auto; padding: 2px 8px; background: #555; font-size: 11px; margin:0;">Back</button>
+            </div>
             
-            <div id="game-area" style="margin-top: 15px; display: none;">
-                <!-- Game elements will be injected here by game.js -->
+            <!-- Setup Section -->
+            <div id="cg-setup">
+                <label style="font-size: 11px; color:#aaa; margin-bottom: 5px; display: block;">Select Difficulty:</label>
+                <select id="cg-difficulty" style="background: rgba(0,0,0,0.5); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 8px; font-size: 12px; border-radius: 8px; margin-bottom: 15px; width: 100%;">
+                    <option value="easy" style="color: black;">Easy (4 Code Length - 7 Guesses)</option>
+                    <option value="normal" style="color: black;">Normal (5 Code Length - 12 Guesses)</option>
+                    <option value="hard" style="color: black;">Hard (6 Code Length - 15 Guesses)</option>
+                </select>
+                <button id="cg-start-btn" style="background: #1db954; font-size: 12px; padding: 10px;">Start Game</button>
+            </div>
+            
+            <!-- Game Play Area -->
+            <div id="cg-game-area" style="display: none; margin-top: 10px;">
+                <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 10px; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">
+                    <span style="color: #ffeb3b;">Guesses left: <strong id="cg-guesses-left" style="font-size: 14px;">7</strong></span>
+                    <button id="cg-quit-btn" style="width: auto; padding: 2px 8px; background: #ff4757; font-size: 10px; margin:0;">Quit</button>
+                </div>
+                
+                <!-- Color Buttons -->
+                <div style="font-size: 11px; color: #aaa; text-align: center; margin-bottom: 5px;">Tap colors to build your guess:</div>
+                <div id="cg-color-picker" style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 15px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 10px;">
+                    <!-- Colored circles will be generated here -->
+                </div>
+                
+                <!-- Current Guess Display -->
+                <div style="background: rgba(0,0,0,0.5); padding: 10px; border-radius: 10px; text-align: center; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1);">
+                    <div style="font-size: 11px; color: #ddd; margin-bottom: 8px;">Your Current Guess:</div>
+                    <div id="cg-current-guess" style="display: flex; justify-content: center; gap: 8px; min-height: 25px;">
+                        <!-- Selected colors appear here -->
+                    </div>
+                    <div style="display: flex; gap: 10px; justify-content: center; margin-top: 12px;">
+                         <button id="cg-clear-btn" style="background: #555; width: auto; padding: 6px 12px; font-size: 11px; margin: 0;">Clear</button>
+                         <button id="cg-submit-btn" style="background: #1e90ff; width: auto; padding: 6px 12px; font-size: 11px; margin: 0; font-weight: bold;">Submit</button>
+                    </div>
+                </div>
+                
+                <!-- History Table -->
+                <div style="font-size: 11px; color: #aaa; margin-bottom: 5px;">History:</div>
+                <div id="cg-history" style="max-height: 180px; overflow-y: auto; font-size: 11px; display: flex; flex-direction: column; gap: 5px;">
+                    <!-- History rows will appear here -->
+                </div>
             </div>
         </div>
 
