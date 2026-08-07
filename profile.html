@@ -2,11 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>My Profile</title>
+    <title>My Profile - Setup</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <!-- Blurred Background Video -->
     <video autoplay loop muted id="profile-bg-video" class="bg-video-blur">
         <source src="anime-video.mp4" type="video/mp4">
     </video>
@@ -15,43 +14,36 @@
         <div class="glass-box" style="max-height: 90vh; overflow-y: auto;">
             <h2>Account Setup</h2>
 
-            <!-- Main Info -->
             <img id="preview-img" src="default-profile.png" class="center-profile" style="width: 100px; height: 100px;">
             <input type="file" id="profile-upload" accept="image/*">
             <input type="text" id="username" placeholder="Choose unique username (e.g. gyan123)">
             <input type="text" id="fullname" placeholder="Full Name">
             <input type="text" id="bio" placeholder="Bio">
             
-            <!-- Social & Music Options -->
             <hr style="margin: 20px 0; border-color: rgba(255,255,255,0.2);">
-            <h3 style="font-size: 16px; margin-bottom: 10px; text-align: left;">🎵 Music & Social Handles</h3>
+            <h3 style="font-size: 14px; margin-bottom: 10px; text-align: left;">🎵 Music & Social Links</h3>
 
             <div style="text-align: left; margin-bottom: 10px;">
-                <label style="font-size: 12px; color: #aaa;">Song Name (Shows on Player)</label>
-                <input type="text" id="song-name-input" placeholder="e.g. My Favorite Track">
+                <label style="font-size: 12px; color: #aaa;">Song Name</label>
+                <input type="text" id="song-name-input" placeholder="Enter Song Name">
+            </div>
+
+            <div style="text-align: left; margin-bottom: 5px;">
+                <label style="font-size: 11px; color: #ffeb3b; display: block; line-height: 1.4;">
+                    ℹ️ Music link YouTube / Spotify<br>
+                    • Spotify: Only run 30s music in web.<br>
+                    • YouTube: Run full music.<br>
+                    (Song kitne bhi minute ka ho, web player 30s ya YT full chalega)
+                </label>
+                <input type="text" id="music-link-input" placeholder="Paste Spotify or YouTube Song Link">
             </div>
 
             <div style="text-align: left; margin-bottom: 10px;">
-                <label style="font-size: 12px; color: #aaa;">Music Link (Spotify / YT Music)</label>
-                <input type="text" id="music-link-input" placeholder="Paste link here...">
-            </div>
-
-            <div style="text-align: left; margin-bottom: 10px;">
-                <label style="font-size: 12px; color: #aaa;">Social Handles</label>
-                <input type="text" id="ig-link" placeholder="Instagram Username">
-                <input type="text" id="fb-link" placeholder="Facebook Profile Link">
+                <label style="font-size: 12px; color: #aaa;">Social Handles (Optional)</label>
+                <input type="text" id="ig-link" placeholder="Instagram Username (e.g. gyan_gupta)">
+                <input type="text" id="yt-link" placeholder="YouTube Channel Link">
             </div>
             
-            <hr style="margin: 15px 0; border-color: rgba(255,255,255,0.2);">
-            
-            <!-- Premium Setup -->
-            <div style="background: rgba(0, 0, 0, 0.5); padding: 15px; border-radius: 8px; border: 1px solid #4da3ff;">
-                <h3 style="color: #4da3ff; margin-bottom: 5px;">👑 Buy Premium</h3>
-                <p style="font-size: 12px; margin-bottom: 10px;">Custom Backgrounds & Badge (20 Days - ₹30)</p>
-                <input type="text" id="upi-input" placeholder="Enter your Sender Name / UPI ID">
-                <button id="submit-upi-btn" class="btn-gold">Submit Payment Request</button>
-            </div>
-
             <button id="save-profile-btn" style="margin-top: 20px;">Save Profile</button>
             <button onclick="window.location.href='index.html'" style="background: #555;">Back to Home</button>
         </div>
