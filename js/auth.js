@@ -1,6 +1,6 @@
 import { auth, db } from './firebase.js'; 
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
-import { ref, get, child, update, push, set, onChildAdded, remove } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
+import { ref, get, child, update, push, set, remove, onChildAdded, off } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
 
 const authBtn = document.getElementById('auth-btn');
 const toggleLink = document.getElementById('toggle-link');
@@ -61,6 +61,8 @@ onAuthStateChanged(auth, async (user) => {
         if(topNav) topNav.style.display = 'flex';
         loadProfileData(user.uid);
         loadViewsCount(user.uid);
+        loadFriendRequests(user.uid);
+        loadMyFriends(user.uid);
     } else {
         authSec.style.display = 'block';
         mainSec.style.display = 'none';
@@ -74,17 +76,15 @@ async function loadProfileData(targetUid) {
         const data = snapshot.val();
         
         document.getElementById('main-username').innerText = (data.isPremium ? "⭐ @" : "@") + (data.username || "user");
-        if(data.fullname || data.bio) document.getElementById('main-bioलेक्ट्र릭').innerText = (data.fullname || "") + " | " + (data.bio || "");
+        if(data.fullname || data.bio) document.getElementById('main-bio').innerText = (data.fullname || "") + " | " + (data.bio || "");
         
         if (data.profilePhoto) {
             document.getElementById('main-profile-img').src = data.profilePhoto;
             if(document.getElementById('corner-img')) document.getElementById('corner-img').src = data.profilePhoto;
         }
         
-        // Render Music Playlist (Max 3)
         const playlistContainer = document.getElementById('playlist-tracks');
         playlistContainer.innerHTML = "";
-        
         const songs = [data.music1, data.music2, data.music3].filter(Boolean);
         if(songs.length === 0) {
             playlistContainer.innerHTML = "<span style='font-size:11px; color:#aaa;'>No songs added</span>";
@@ -96,7 +96,6 @@ async function loadProfileData(targetUid) {
             });
         }
         
-        // Social Handles Redirect Buttons
         const socialContainer = document.getElementById('social-buttons-container');
         socialContainer.innerHTML = "";
         if (data.instaLink) {
@@ -123,7 +122,6 @@ async function loadViewsCount(targetUid) {
     if(document.getElementById('views-count')) document.getElementById('views-count').innerText = count;
 }
 
-// Share Button
 const shareBtn = document.getElementById('share-profile-btn');
 if(shareBtn) {
     shareBtn.addEventListener('click', () => {
@@ -136,7 +134,6 @@ if(shareBtn) {
     });
 }
 
-// Sound & Menu
 const soundBtn = document.getElementById('sound-toggle');
 const bgVideo = document.getElementById('main-bg-video');
 if (soundBtn && bgVideo) {
@@ -155,64 +152,196 @@ if (cornerImg && dropdownMenu) {
 }
 
 // -----------------------------------------------------
-// CHAT SYSTEM WITH 3-MINUTE AUTO DELETE
+// FRIENDS SYSTEM & PRIVATE CHAT LOGIC (FIXED)
 // -----------------------------------------------------
-const openChatBtn = document.getElementById('open-chat-btn');
-const closeChatBtn = document.getElementById('close-chat-btn');
-const chatSection = document.getElementById('chat-section');
-const sendChatBtn = document.getElementById('send-chat-btn');
-const chatMessages = document.getElementById('chat-messages');
-
-if(openChatBtn) {
-    openChatBtn.addEventListener('click', () => {
-        chatSection.style.display = 'flex';
-        dropdownMenu.style.display = 'none';
-    });
-}
-if(closeChatBtn) {
-    closeChatBtn.addEventListener('click', () => { chatSection.style.display = 'none'; });
-}
-
-if(sendChatBtn) {
-    sendChatBtn.addEventListener('click', async () => {
-        const input = document.getElementById('chat-input');
-        const text = input.value.trim();
-        if(!text) return;
-
-        const user = auth.currentUser;
-        const chatRef = push(ref(db, 'community_chat'));
-        
-        // Save message with timestamp
-        await set(chatRef, {
-            email: user.email.split('@')[0],
-            message: text,
-            timestamp: Date.now()
-        });
-        input.value = "";
-    });
-}
-
-// Listen to chat & auto delete messages older than 3 minutes (180,000 ms)
-const chatDbRef = ref(db, 'community_chat');
-onChildAdded(chatDbRef, (snapshot) => {
-    const msgData = snapshot.val();
-    const msgId = snapshot.key;
-    const age = Date.now() - msgData.timestamp;
-
-    if (age > 180000) {
-        // Already older than 3 mins, delete it immediately
-        remove(ref(db, `community_chat/${msgId}`));
-        return;
-    }
-
-    // Append to UI
-    chatMessages.innerHTML += `<div><b>@${msgData.email}:</b> ${msgData.message}</div>`;
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-
-    // Schedule auto-delete remaining time
-    setTimeout(() => {
-        remove(ref(db, `community_chat/${msgId}`));
-        // Reload or clear UI if needed, Firebase real-time listeners handle cleanliness
-    }, 180000 - age);
+const friendsModal = document.getElementById('friends-modal');
+document.getElementById('open-friends-menu').addEventListener('click', () => {
+    friendsModal.style.display = 'block';
+    dropdownMenu.style.display = 'none';
+});
+document.getElementById('close-friends-modal').addEventListener('click', () => {
+    friendsModal.style.display = 'none';
 });
 
+const tabFind = document.getElementById('tab-find');
+const tabReq = document.getElementById('tab-req');
+const tabList = document.getElementById('tab-list');
+const secFind = document.getElementById('section-find');
+const secReq = document.getElementById('section-req');
+const secList = document.getElementById('section-list');
+
+tabFind.addEventListener('click', () => {
+    secFind.style.display = 'block'; secReq.style.display = 'none'; secList.style.display = 'none';
+    tabFind.style.background = '#007bff'; tabReq.style.background = '#555'; tabList.style.background = '#555';
+});
+tabReq.addEventListener('click', () => {
+    secFind.style.display = 'none'; secReq.style.display = 'block'; secList.style.display = 'none';
+    tabReq.style.background = '#007bff'; tabFind.style.background = '#555'; tabList.style.background = '#555';
+});
+tabList.addEventListener('click', () => {
+    secFind.style.display = 'none'; secReq.style.display = 'none'; secList.style.display = 'block';
+    tabList.style.background = '#007bff'; tabFind.style.background = '#555'; tabReq.style.background = '#555';
+});
+
+document.getElementById('search-btn').addEventListener('click', async () => {
+    const q = document.getElementById('search-username').value.trim();
+    const res = document.getElementById('search-result');
+    if(!q) return;
+    res.innerHTML = "Searching...";
+
+    const uRef = await get(child(ref(db), `usernames/${q}`));
+    if(uRef.exists()) {
+        const fUid = uRef.val();
+        if(fUid === auth.currentUser.uid) {
+            res.innerHTML = "<span style='color:orange; font-size:11px;'>This is your own username!</span>";
+            return;
+        }
+        const fSnap = await get(child(ref(db), `users/${fUid}`));
+        if(fSnap.exists()) {
+            const fd = fSnap.val();
+            res.innerHTML = `
+                <div style="background:rgba(255,255,255,0.1); padding:8px; border-radius:6px; display:flex; justify-content:space-between; align-items:center; margin-top:5px;">
+                    <span style="font-size:12px;">@${fd.username}</span>
+                    <button onclick="sendFriendReq('${fUid}')" style="width:auto; padding:4px 8px; font-size:10px; background:#1db954; margin:0;">Add Friend</button>
+                </div>
+            `;
+        }
+    } else {
+        res.innerHTML = "<span style='color:#ff4757; font-size:11px;'>User not found!</span>";
+    }
+});
+
+window.sendFriendReq = async function(targetUid) {
+    const myUid = auth.currentUser.uid;
+    await set(ref(db, `users/${targetUid}/friendRequests/${myUid}`), { timestamp: Date.now() });
+    alert("Friend request sent!");
+};
+
+async function loadFriendRequests(myUid) {
+    const reqDiv = document.getElementById('requests-list');
+    const snap = await get(child(ref(db), `users/${myUid}/friendRequests`));
+    if(snap.exists()) {
+        reqDiv.innerHTML = "";
+        snap.forEach(async (childSnap) => {
+            const senderUid = childSnap.key;
+            const sSnap = await get(child(ref(db), `users/${senderUid}`));
+            if(sSnap.exists()) {
+                const sd = sSnap.val();
+                reqDiv.innerHTML += `
+                    <div style="background:rgba(255,255,255,0.1); padding:6px; border-radius:6px; display:flex; justify-content:space-between; align-items:center; margin-bottom:5px; font-size:11px;">
+                        <span>@${sd.username}</span>
+                        <div>
+                            <button onclick="acceptReq('${senderUid}')" style="width:auto; padding:3px 6px; font-size:10px; background:#2ed573; margin:0;">Accept</button>
+                            <button onclick="denyReq('${senderUid}')" style="width:auto; padding:3px 6px; font-size:10px; background:#ff4757; margin:0;">Deny</button>
+                        </div>
+                    </div>
+                `;
+            }
+        });
+    } else {
+        reqDiv.innerHTML = "<span style='font-size:11px; color:#aaa;'>No pending requests.</span>";
+    }
+}
+
+window.acceptReq = async function(senderUid) {
+    const myUid = auth.currentUser.uid;
+    await set(ref(db, `users/${myUid}/friends/${senderUid}`), true);
+    await set(ref(db, `users/${senderUid}/friends/${myUid}`), true);
+    await remove(ref(db, `users/${myUid}/friendRequests/${senderUid}`));
+    alert("Friend added!");
+    location.reload();
+};
+
+window.denyReq = async function(senderUid) {
+    const myUid = auth.currentUser.uid;
+    await remove(ref(db, `users/${myUid}/friendRequests/${senderUid}`));
+    alert("Request denied.");
+    location.reload();
+};
+
+async function loadMyFriends(myUid) {
+    const listDiv = document.getElementById('my-friends-list');
+    const snap = await get(child(ref(db), `users/${myUid}/friends`));
+    if(snap.exists()) {
+        listDiv.innerHTML = "";
+        snap.forEach(async (childSnap) => {
+            const fUid = childSnap.key;
+            const fSnap = await get(child(ref(db), `users/${fUid}`));
+            if(fSnap.exists()) {
+                const fd = fSnap.val();
+                listDiv.innerHTML += `
+                    <div style="background:rgba(255,255,255,0.1); padding:6px; border-radius:6px; display:flex; justify-content:space-between; align-items:center; margin-bottom:5px; font-size:11px;">
+                        <span>@${fd.username}</span>
+                        <button onclick="openChat('${fUid}', '${fd.username}')" style="width:auto; padding:3px 8px; font-size:10px; background:#1db954; margin:0;">Chat</button>
+                    </div>
+                `;
+            }
+        });
+    } else {
+        listDiv.innerHTML = "<span style='font-size:11px; color:#aaa;'>No friends added yet.</span>";
+    }
+}
+
+let activeChatRoom = null;
+let currentChatListener = null;
+
+window.openChat = function(friendUid, friendName) {
+    const myUid = auth.currentUser.uid;
+    document.getElementById('private-chat-box').style.display = 'block';
+    document.getElementById('chatting-with-name').innerText = "Chat with @" + friendName;
+    
+    const msgContainer = document.getElementById('chat-messages');
+    msgContainer.innerHTML = "";
+    
+    // Purana listener hatao taaki doosre friend ke messages mix na hon
+    if (currentChatListener) {
+        off(currentChatListener);
+    }
+
+    // Har do doston ka ek alag unique room banta hai
+    activeChatRoom = myUid < friendUid ? `${myUid}_${friendUid}` : `${friendUid}_${myUid}`;
+    
+    currentChatListener = ref(db, `private_chats/${activeChatRoom}`);
+    onChildAdded(currentChatListener, (snapshot) => {
+        const msg = snapshot.val();
+        const msgId = snapshot.key;
+        const age = Date.now() - msg.timestamp;
+
+        if(age > 180000) {
+            remove(ref(db, `private_chats/${activeChatRoom}/${msgId}`));
+            return;
+        }
+
+        msgContainer.innerHTML += `<div><b>@${msg.sender}:</b> ${msg.message}</div>`;
+        msgContainer.scrollTop = msgContainer.scrollHeight;
+
+        setTimeout(() => {
+            remove(ref(db, `private_chats/${activeChatRoom}/${msgId}`));
+        }, 180000 - age);
+    });
+};
+
+document.getElementById('close-chat-box').addEventListener('click', () => {
+    document.getElementById('private-chat-box').style.display = 'none';
+    if (currentChatListener) off(currentChatListener);
+    activeChatRoom = null;
+});
+
+document.getElementById('send-chat-btn').addEventListener('click', async () => {
+    const input = document.getElementById('chat-input');
+    const text = input.value.trim();
+    if(!text || !activeChatRoom) return;
+
+    const user = auth.currentUser;
+    const msgRef = push(ref(db, `private_chats/${activeChatRoom}`));
+    
+    const userSnap = await get(child(ref(db), `users/${user.uid}/username`));
+    const username = userSnap.exists() ? userSnap.val() : "user";
+
+    await set(msgRef, {
+        sender: username,
+        message: text,
+        timestamp: Date.now()
+    });
+    input.value = "";
+});
