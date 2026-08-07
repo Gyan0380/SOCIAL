@@ -11,15 +11,16 @@
         <source src="anime-video.mp4" type="video/mp4">
     </video>
 
-    <!-- Top Corner Nav (Only for logged-in user) -->
+    <!-- Top Corner Nav -->
     <div class="top-nav" id="top-nav" style="display: none;">
-        <button id="share-profile-btn" style="background: #1e90ff; padding: 6px 12px; font-size: 12px; border-radius: 20px; width: auto;">📤 Share Profile</button>
+        <button id="share-profile-btn" style="background: #1e90ff; padding: 6px 12px; font-size: 12px; border-radius: 20px; width: auto;">📤 Share</button>
         
         <div id="corner-profile" style="position: relative;">
             <img id="corner-img" src="default-profile.png" style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid white; cursor: pointer; object-fit: cover;">
             
             <div id="dropdown-menu" style="display: none; position: absolute; top: 50px; right: 0; background: rgba(0,0,0,0.9); padding: 10px; border-radius: 8px; width: 140px; border: 1px solid rgba(255,255,255,0.2);">
                 <button onclick="window.location.href='profile.html'" style="padding: 6px; font-size: 12px; margin-bottom: 5px;">✏️ Edit Profile</button>
+                <button id="open-chat-btn" style="background: #1db954; padding: 6px; font-size: 12px; margin-bottom: 5px;">💬 Chat</button>
                 <button onclick="window.location.href='admin.html'" style="background: #f39c12; padding: 6px; font-size: 12px; margin-bottom: 5px;">⚙️ Admin</button>
                 <button id="logout-btn" style="background: #ff4757; padding: 6px; font-size: 12px;">🚪 Logout</button>
             </div>
@@ -41,43 +42,46 @@
             </p>
         </div>
 
-        <!-- Main Screen / Public View Screen -->
+        <!-- Main Profile Screen -->
         <div id="main-screen" style="display: none; width: 100%; max-width: 400px; text-align: center;">
             
-            <!-- Profile DP & Name -->
-            <div style="margin-bottom: 20px;">
-                <img id="main-profile-img" src="default-profile.png" style="width: 130px; height: 130px; border-radius: 50%; border: 3px solid white; object-fit: cover; box-shadow: 0 0 20px rgba(0,0,0,0.6);">
-                <h2 id="main-username" style="margin-top: 15px; text-shadow: 2px 2px 5px black;">@username</h2>
-                <p id="main-bio" style="font-size: 13px; color: #ddd; margin-top: 5px;"></p>
+            <div style="margin-bottom: 15px;">
+                <img id="main-profile-img" src="default-profile.png" style="width: 120px; height: 120px; border-radius: 50%; border: 3px solid white; object-fit: cover; box-shadow: 0 0 15px rgba(0,0,0,0.6);">
+                <h2 id="main-username" style="margin-top: 10px; text-shadow: 2px 2px 5px black;">@username</h2>
+                <p id="main-bio" style="font-size: 12px; color: #ddd; margin-top: 3px;"></p>
             </div>
 
-            <!-- Music Player Container -->
-            <div class="music-container" id="music-box-ui">
-                <button id="play-pause-btn" class="play-pause-btn">▶</button>
-                <div class="song-info-box">
-                    <div class="song-name-text" id="display-song-name">No song added</div>
-                    <div class="waveform-progress">
-                        <div class="waveform-fill" id="music-progress"></div>
-                    </div>
+            <!-- Clean Music Playlist Container (Max 3 Songs) -->
+            <div id="music-playlist-container" style="background: rgba(0,0,0,0.6); padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2); margin-bottom: 15px;">
+                <h4 style="font-size: 13px; margin-bottom: 8px; color: #1db954;">🎵 Music Playlist</h4>
+                <div id="playlist-tracks" style="display: flex; flex-direction: column; gap: 8px;">
+                    <!-- Dynamically populated tracks -->
                 </div>
             </div>
 
-            <!-- Spotify Direct Redirect Button (Appears only if Spotify link is present) -->
-            <div id="spotify-redirect-container" style="margin-top: 10px; display: none;">
-                <a id="spotify-direct-link" href="#" target="_blank" style="display: block; background: #1db954; color: white; padding: 10px; border-radius: 20px; font-size: 13px; font-weight: bold; text-decoration: none;">
-                    🟢 Play full song on Spotify
-                </a>
+            <!-- Social Media Buttons -->
+            <div id="social-buttons-container" style="display: flex; justify-content: center; gap: 10px; margin-bottom: 10px;"></div>
+
+            <!-- Profile Views Counter -->
+            <div style="font-size: 11px; color: #aaa; background: rgba(0,0,0,0.4); padding: 4px 10px; border-radius: 10px; display: inline-block;">
+                👁️ Views: <span id="views-count">0</span>
             </div>
 
-            <!-- Hidden Audio/Embed Container -->
-            <div id="embedded-player-container"></div>
+            <div id="back-my-profile" style="margin-top: 15px; display: none;">
+                <button onclick="window.location.href='index.html'" style="background: #333; font-size: 12px; width: auto; padding: 6px 15px; border-radius: 20px;">🏠 View My Profile</button>
+            </div>
+        </div>
 
-            <!-- Social Media Buttons (Auto generated if added) -->
-            <div id="social-buttons-container" style="margin-top: 20px; display: flex; justify-content: center; gap: 10px;"></div>
-
-            <!-- Back to my profile button (Visible when viewing someone else) -->
-            <div id="back-my-profile" style="margin-top: 25px; display: none;">
-                <button onclick="window.location.href='index.html'" style="background: #333; font-size: 12px; width: auto; padding: 8px 20px; border-radius: 20px;">🏠 View My Profile</button>
+        <!-- Chat Section with 3-Min Auto Delete -->
+        <div id="chat-section" class="glass-box" style="display: none; position: absolute; top: 80px; width: 90%; max-width: 400px; height: 75vh; z-index: 50; display: none; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px;">
+                <h3 style="font-size: 14px;">💬 Community Chat <span style="font-size:10px; color:#ffeb3b;">(Auto-deletes in 3m)</span></h3>
+                <button id="close-chat-btn" style="width: auto; padding: 2px 8px; background: #ff4757; font-size: 11px; margin:0;">X</button>
+            </div>
+            <div id="chat-messages" style="flex-grow: 1; overflow-y: auto; margin: 10px 0; padding: 5px; text-align: left; font-size: 12px; display: flex; flex-direction: column; gap: 5px;"></div>
+            <div style="display: flex; gap: 5px;">
+                <input type="text" id="chat-input" placeholder="Type message..." style="margin:0; padding:8px; font-size:12px;">
+                <button id="send-chat-btn" style="width: 70px; margin:0; padding:8px; font-size:12px; background:#1db954;">Send</button>
             </div>
         </div>
     </div>
