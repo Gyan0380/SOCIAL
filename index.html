@@ -52,14 +52,43 @@
             </p>
         </div>
 
-        <!-- Friends Modal (Hidden for brevity) -->
+        <!-- ======================================= -->
+        <!-- FRIENDS MODAL -->
+        <!-- ======================================= -->
         <div id="friends-modal" class="glass-box" style="display: none; position: absolute; top: 70px; width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto; z-index: 50; text-align: left;">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px; margin-bottom: 10px;">
                 <h3 style="font-size: 15px; margin:0;">👥 Friends & Chat</h3>
                 <button id="close-friends-modal" style="width: auto; padding: 2px 8px; background: #ff4757; font-size: 11px; margin:0;">X</button>
             </div>
-            <!-- ... (Keep your existing friends modal content here) ... -->
-            <button id="close-chat-box" style="display:none;"></button>
+            <div style="display: flex; gap: 5px; margin-bottom: 15px;">
+                <button id="tab-find" style="padding: 6px; font-size: 11px; margin:0; background:#007bff;">Find Friend</button>
+                <button id="tab-req" style="padding: 6px; font-size: 11px; margin:0; background:#555;">Requests</button>
+                <button id="tab-list" style="padding: 6px; font-size: 11px; margin:0; background:#555;">My Friends</button>
+            </div>
+            <div id="section-find" style="display: block;">
+                <input type="text" id="search-username" placeholder="Search exact username..." style="font-size: 12px; padding: 8px;">
+                <button id="search-btn" style="padding: 8px; font-size: 12px; background: #1db954;">Search</button>
+                <div id="search-result" style="margin-top: 10px;"></div>
+            </div>
+            <div id="section-req" style="display: none;">
+                <h4 style="font-size: 12px; margin-bottom: 8px;">Pending Requests:</h4>
+                <div id="requests-list">No pending requests.</div>
+            </div>
+            <div id="section-list" style="display: none;">
+                <h4 style="font-size: 12px; margin-bottom: 8px;">Your Friends:</h4>
+                <div id="my-friends-list">No friends added yet.</div>
+            </div>
+            <div id="private-chat-box" style="display: none; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 10px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                    <span id="chatting-with-name" style="font-size: 13px; font-weight: bold; color: #1db954;">Chat</span>
+                    <button id="close-chat-box" style="width: auto; padding: 2px 6px; font-size: 10px; background: #555; margin:0;">Back</button>
+                </div>
+                <div id="chat-messages" style="height: 150px; overflow-y: auto; background: rgba(0,0,0,0.4); padding: 8px; border-radius: 6px; font-size: 11px; display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px;"></div>
+                <div style="display: flex; gap: 5px;">
+                    <input type="text" id="chat-input" placeholder="Type message (Auto-deletes in 3m)..." style="margin:0; padding:6px; font-size:11px;">
+                    <button id="send-chat-btn" style="width: 60px; margin:0; padding:6px; font-size:11px; background:#1db954;">Send</button>
+                </div>
+            </div>
         </div>
 
         <!-- ======================================= -->
@@ -119,7 +148,7 @@
         </div>
 
         <!-- ======================================= -->
-        <!-- 4. TIC-TAC-TOE (O X) MULTIPLAYER MODAL -->
+        <!-- 2. TIC-TAC-TOE (O X) MULTIPLAYER MODAL -->
         <!-- ======================================= -->
         <div id="tic-tac-toe-modal" class="glass-box" style="display: none; position: absolute; top: 70px; width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto; z-index: 62; text-align: left;">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px; margin-bottom: 10px;">
@@ -173,15 +202,73 @@
             </div>
         </div>
 
-        <!-- OLD GAMES MODALS (Hidden for brevity, keep your Code Guess & Memory Match Modals here) -->
-        <div id="code-guess-modal" class="glass-box" style="display: none; position: absolute; top: 70px; width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto; z-index: 61;">
-             <!-- (Paste your existing code guess html here) -->
-        </div>
-        <div id="memory-match-modal" class="glass-box" style="display: none; position: absolute; top: 70px; width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto; z-index: 61;">
-             <!-- (Paste your existing memory match html here) -->
+        <!-- ======================================= -->
+        <!-- 3. CODE GUESS GAME MODAL -->
+        <!-- ======================================= -->
+        <div id="code-guess-modal" class="glass-box" style="display: none; position: absolute; top: 70px; width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto; z-index: 61; text-align: left;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px; margin-bottom: 10px;">
+                <h3 style="font-size: 15px; margin:0;">🧠 Code Guess</h3>
+                <button id="back-to-hub-cg" style="width: auto; padding: 2px 8px; background: #555; font-size: 11px; margin:0;">Back</button>
+            </div>
+            <div id="cg-setup">
+                <label style="font-size: 11px; color:#aaa; margin-bottom: 5px; display: block;">Select Difficulty (Earn Coins):</label>
+                <select id="cg-difficulty" style="background: rgba(0,0,0,0.5); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 8px; font-size: 12px; border-radius: 8px; margin-bottom: 15px; width: 100%;">
+                    <option value="easy" style="color: black;">Easy (4 Colors) - 1 🪙</option>
+                    <option value="normal" style="color: black;">Normal (5 Colors) - 2 🪙</option>
+                    <option value="hard" style="color: black;">Hard (6 Colors) - 5 🪙</option>
+                </select>
+                <button id="cg-start-btn" style="background: #1db954; font-size: 12px; padding: 10px;">Start Game</button>
+            </div>
+            <div id="cg-game-area" style="display: none; margin-top: 10px;">
+                <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 10px; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">
+                    <span style="color: #ffeb3b;">Guesses left: <strong id="cg-guesses-left" style="font-size: 14px;">7</strong></span>
+                    <button id="cg-quit-btn" style="width: auto; padding: 2px 8px; background: #ff4757; font-size: 10px; margin:0;">Quit</button>
+                </div>
+                <div style="font-size: 11px; color: #aaa; text-align: center; margin-bottom: 5px;">Tap colors to build your guess:</div>
+                <div id="cg-color-picker" style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 15px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 10px;"></div>
+                <div style="background: rgba(0,0,0,0.5); padding: 10px; border-radius: 10px; text-align: center; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1);">
+                    <div style="font-size: 11px; color: #ddd; margin-bottom: 8px;">Your Current Guess:</div>
+                    <div id="cg-current-guess" style="display: flex; justify-content: center; gap: 8px; min-height: 25px;"></div>
+                    <div style="display: flex; gap: 10px; justify-content: center; margin-top: 12px;">
+                         <button id="cg-clear-btn" style="background: #555; width: auto; padding: 6px 12px; font-size: 11px; margin: 0;">Clear</button>
+                         <button id="cg-submit-btn" style="background: #1e90ff; width: auto; padding: 6px 12px; font-size: 11px; margin: 0; font-weight: bold;">Submit</button>
+                    </div>
+                </div>
+                <div style="font-size: 11px; color: #aaa; margin-bottom: 5px;">History:</div>
+                <div id="cg-history" style="max-height: 180px; overflow-y: auto; font-size: 11px; display: flex; flex-direction: column; gap: 5px;"></div>
+            </div>
         </div>
 
+        <!-- ======================================= -->
+        <!-- 4. MEMORY MATCH GAME MODAL -->
+        <!-- ======================================= -->
+        <div id="memory-match-modal" class="glass-box" style="display: none; position: absolute; top: 70px; width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto; z-index: 61; text-align: left;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px; margin-bottom: 10px;">
+                <h3 style="font-size: 15px; margin:0;">🃏 Memory Match</h3>
+                <button id="back-to-hub-mm" style="width: auto; padding: 2px 8px; background: #555; font-size: 11px; margin:0;">Back</button>
+            </div>
+            <div id="mm-setup">
+                <label style="font-size: 11px; color:#aaa; margin-bottom: 5px; display: block;">Select Difficulty (Earn Coins):</label>
+                <select id="mm-difficulty" style="background: rgba(0,0,0,0.5); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 8px; font-size: 12px; border-radius: 8px; margin-bottom: 15px; width: 100%;">
+                    <option value="easy" style="color: black;">Easy (12 Cards) - 1 🪙</option>
+                    <option value="normal" style="color: black;">Normal (16 Cards) - 2 🪙</option>
+                    <option value="hard" style="color: black;">Hard (20 Cards) - 5 🪙</option>
+                </select>
+                <button id="mm-start-btn" style="background: #ffeb3b; color: black; font-size: 12px; padding: 10px;">Start Matching!</button>
+            </div>
+            <div id="mm-game-area" style="display: none; margin-top: 10px;">
+                <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 15px; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">
+                    <span style="color: #1db954;">Moves: <strong id="mm-moves-txt" style="font-size: 14px;">0</strong></span>
+                    <button id="mm-quit-btn" style="width: auto; padding: 2px 8px; background: #ff4757; font-size: 10px; margin:0;">Quit</button>
+                </div>
+                <!-- Game Grid -->
+                <div id="mm-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px;"></div>
+            </div>
+        </div>
+
+        <!-- ======================================= -->
         <!-- MAIN PROFILE SCREEN -->
+        <!-- ======================================= -->
         <div id="main-screen" style="display: none; width: 100%; max-width: 400px; text-align: center;">
             <div style="margin-bottom: 15px;">
                 <img id="main-profile-img" src="default-profile.png" style="width: 120px; height: 120px; border-radius: 50%; border: 3px solid white; object-fit: cover; box-shadow: 0 0 15px rgba(0,0,0,0.6);">
@@ -192,11 +279,36 @@
             <!-- Games Open Button -->
             <button id="main-open-games-btn" style="background: linear-gradient(135deg, #9b59b6, #8e44ad); width: 100%; border-radius: 12px; font-size: 14px; font-weight: bold; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(155, 89, 182, 0.4);">🎮 Games & 🪙 Coins</button>
             
+            <!-- Music Box -->
+            <div class="music-container" id="main-play-box" style="display: none; background: rgba(0,0,0,0.7); padding: 12px 15px; border-radius: 50px; display: flex; align-items: center; gap: 12px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.2);">
+                <button id="play-pause-btn" class="play-pause-btn" style="background: #1db954; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 16px; cursor: pointer;">▶</button>
+                <div class="song-info-box" style="text-align: left; flex-grow: 1;">
+                    <div class="song-name-text" id="display-song-name" style="font-size: 13px; font-weight: bold; color: white;">Play Music</div>
+                    <div style="font-size: 10px; color: #aaa;">Click to play/preview</div>
+                </div>
+            </div>
+            <div id="embedded-player-container"></div>
+
+            <!-- Music Playlist Container -->
+            <div id="music-playlist-container" style="display: none; background: rgba(0,0,0,0.65); padding: 12px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.2); margin-bottom: 15px;">
+                <h4 style="font-size: 13px; margin-bottom: 8px; color: #1db954;">📑 Music Playlists</h4>
+                <div id="playlist-tracks" style="display: flex; flex-direction: column; gap: 8px;"></div>
+            </div>
+
+            <!-- Social Media Buttons Container -->
+            <div id="social-buttons-container" style="display: none; justify-content: center; gap: 10px; margin-bottom: 10px;"></div>
+
+            <div style="font-size: 11px; color: #aaa; background: rgba(0,0,0,0.4); padding: 4px 10px; border-radius: 10px; display: inline-block;">
+                👁️ Views: <span id="views-count">0</span>
+            </div>
+
             <div id="back-my-profile" style="margin-top: 15px; display: none;">
                 <button onclick="window.location.href='index.html'" style="background: #333; font-size: 12px; width: auto; padding: 6px 15px; border-radius: 20px;">🏠 View My Profile</button>
             </div>
         </div>
     </div>
+
+    <div class="creator-watermark">web created by GYAN GUPTA</div>
 
     <script type="module" src="js/firebase.js"></script>
     <script type="module" src="js/auth.js"></script>
