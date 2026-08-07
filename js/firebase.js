@@ -3,13 +3,13 @@ import { getAuth } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth
 import { getDatabase } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
 
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  databaseURL: "YOUR_DATABASE_URL",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyDcB58Ateul9QxWtYvrIsYluyXDQ_QCKX8",
+  authDomain: "developer-ab7cb.firebaseapp.com",
+  databaseURL: "https://developer-ab7cb-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "developer-ab7cb",
+  storageBucket: "developer-ab7cb.appspot.com",
+  messagingSenderId: "178491662020",
+  appId: "1:178491662020:web:3f8e69fe48e91f8d802379"
 };
 
 const app = initializeApp(firebaseConfig);
