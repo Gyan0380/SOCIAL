@@ -1,38 +1,45 @@
 import { auth, db } from './firebase.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
-import { ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
+import { ref, set, get, update, child } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
 
 const profileUpload = document.getElementById('profile-upload');
 const previewImg = document.getElementById('preview-img');
 const saveBtn = document.getElementById('save-profile-btn');
-let base64String = "";
+const upiBtn = document.getElementById('submit-upi-btn');
 let currentUser = null;
+let base64String = "";
+let customBgBase64 = "";
 
-// 1. Convert Image to Base64 on Select
-profileUpload.addEventListener('change', (event) => {
-    const file = event.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            base64String = e.target.result; // Base64 Data
-            previewImg.src = base64String;  // Show preview
-        };
-        reader.readAsDataURL(file);
-    }
-});
+// Convert Main Profile Image
+if (profileUpload) {
+    profileUpload.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (ev) => { base64String = ev.target.result; previewImg.src = base64String; };
+            reader.readAsDataURL(file);
+        }
+    });
+}
 
-// 2. Wait for User to Login
+// Convert Premium Custom BG Image
+const customBgUpload = document.getElementById('custom-bg-upload');
+if (customBgUpload) {
+    customBgUpload.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (ev) => { customBgBase64 = ev.target.result; alert("Custom BG Selected!"); };
+            reader.readAsDataURL(file);
+        }
+    });
+}
+
 onAuthStateChanged(auth, (user) => {
-    if (user) {
-        currentUser = user;
-        loadExistingProfile(user.uid);
-    } else {
-        alert("Please login first!");
-        window.location.href = "index.html";
-    }
+    if (user) { currentUser = user; loadExistingProfile(user.uid); } 
+    else { window.location.href = "index.html"; }
 });
 
-// 3. Load Profile if exists
 function loadExistingProfile(uid) {
     get(child(ref(db), `users/${uid}`)).then((snapshot) => {
         if (snapshot.exists()) {
@@ -40,68 +47,100 @@ function loadExistingProfile(uid) {
             document.getElementById('username').value = data.username || "";
             document.getElementById('fullname').value = data.fullname || "";
             document.getElementById('bio').value = data.bio || "";
-            document.getElementById('ig-link').value = data.ig || "";
-            document.getElementById('fb-link').value = data.fb || "";
-            document.getElementById('yt-link').value = data.song || "";
-            
-            if(data.profilePhoto) {
-                base64String = data.profilePhoto;
-                previewImg.src = base64String;
+            if (data.profilePhoto) { base64String = data.profilePhoto; previewImg.src = base64String; }
+            if (data.customBgUrl) document.getElementById('custom-bg-url').value = data.customBgUrl;
+
+            // Premium Expiry Logic
+            const premiumSettings = document.getElementById('premium-settings');
+            if (data.isPremium && data.premiumExpiry) {
+                if (Date.now() > data.premiumExpiry) {
+                    // Expired
+                    update(ref(db, `users/${uid}`), { isPremium: false, premiumExpiry: null });
+                    if (premiumSettings) premiumSettings.style.display = "none";
+                    applyDefaultBg();
+                } else {
+                    // Active Premium
+                    if (premiumSettings) premiumSettings.style.display = "block";
+                    if (!data.isSuspended) applyCustomBg(data.customBgUrl, data.customBgImage);
+                }
+            } else {
+                applyDefaultBg();
+            }
+
+            // Load Notifications
+            if (data.notifications) {
+                const notiBox = document.getElementById('notifications-box');
+                const notiList = document.getElementById('noti-list');
+                notiBox.style.display = 'block';
+                notiList.innerHTML = '';
+                Object.values(data.notifications).forEach(n => {
+                    notiList.innerHTML += `<li style="margin-bottom:5px; border-bottom:1px solid #444; padding-bottom:5px;">${n.message}</li>`;
+                });
             }
         }
     });
 }
 
-// 4. Save Profile Data & Check Unique Username
-saveBtn.addEventListener('click', async () => {
-    if (!currentUser) return;
+function applyDefaultBg() {
+    const v = document.getElementById('profile-bg-video') || document.getElementById('main-bg-video');
+    if (v) { v.src = "anime-video.mp4"; v.style.display = "block"; }
+    document.body.style.backgroundImage = "none";
+}
 
-    const username = document.getElementById('username').value.trim();
-    const fullname = document.getElementById('fullname').value.trim();
-    
-    if (username === "") {
-        alert("Username is required!");
-        return;
+function applyCustomBg(url, imageBase64) {
+    const v = document.getElementById('profile-bg-video') || document.getElementById('main-bg-video');
+    if (url && v) {
+        v.src = url; v.style.display = "block"; document.body.style.backgroundImage = "none";
+    } else if (imageBase64) {
+        if (v) v.style.display = "none";
+        document.body.style.backgroundImage = `url(${imageBase64})`;
+        document.body.style.backgroundSize = "cover"; document.body.style.backgroundPosition = "center";
     }
+}
 
-    saveBtn.innerText = "Saving...";
+// Save Profile
+if (saveBtn) {
+    saveBtn.addEventListener('click', async () => {
+        const username = document.getElementById('username').value.trim();
+        if (!username) return alert("Username required!");
+        saveBtn.innerText = "Saving...";
 
-    try {
-        // Check if username is already taken by someone else
         const usernameRef = ref(db, `usernames/${username}`);
-        const snapshot = await get(usernameRef);
-        
-        if (snapshot.exists() && snapshot.val() !== currentUser.uid) {
-            alert("This username is already taken. Try another one!");
-            saveBtn.innerText = "Save Profile";
-            return;
+        const snap = await get(usernameRef);
+        if (snap.exists() && snap.val() !== currentUser.uid) {
+            alert("Username already taken!"); saveBtn.innerText = "Save Profile"; return;
         }
 
-        // Save data to Realtime Database
-        const userData = {
+        const customUrl = document.getElementById('custom-bg-url').value.trim();
+
+        await update(ref(db, `users/${currentUser.uid}`), {
             username: username,
-            fullname: fullname,
+            fullname: document.getElementById('fullname').value,
             bio: document.getElementById('bio').value,
-            ig: document.getElementById('ig-link').value,
-            fb: document.getElementById('fb-link').value,
-            song: document.getElementById('yt-link').value,
-            profilePhoto: base64String, // Saved directly as text
-            isPremium: false,
-            email: currentUser.email
-        };
-
-        // Save under User Node
-        await set(ref(db, `users/${currentUser.uid}`), userData);
-        
-        // Reserve the Username
+            profilePhoto: base64String,
+            customBgUrl: customUrl,
+            customBgImage: customBgBase64 || null
+        });
         await set(ref(db, `usernames/${username}`), currentUser.uid);
+        alert("Saved Successfully!"); window.location.href = "index.html";
+    });
+}
 
-        alert("Profile saved successfully!");
-        window.location.href = "index.html"; // Go back to main screen
-    } catch (error) {
-        alert("Error saving profile: " + error.message);
-    }
-    
-    saveBtn.innerText = "Save Profile";
-});
-
+// Submit UPI Request
+if (upiBtn) {
+    upiBtn.addEventListener('click', async () => {
+        const upiId = document.getElementById('upi-input').value.trim();
+        if (!upiId) return alert("Please enter UPI ID!");
+        
+        await update(ref(db, `users/${currentUser.uid}`), {
+            paymentPending: true,
+            paymentUpiId: upiId
+        });
+        
+        const notiRef = push(ref(db, `users/${currentUser.uid}/notifications`));
+        await set(notiRef, { message: "Your payment is pending. It will be confirmed within 12 hours.", timestamp: Date.now() });
+        
+        alert("Payment request sent to admin!");
+        document.getElementById('upi-input').value = "";
+    });
+}
