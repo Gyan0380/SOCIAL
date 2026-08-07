@@ -42,40 +42,35 @@
             </p>
         </div>
 
-        <!-- MAIN FRIENDS & CHAT POPUP SECTION -->
+        <!-- Friends Modal -->
         <div id="friends-modal" class="glass-box" style="display: none; position: absolute; top: 70px; width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto; z-index: 50; text-align: left;">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px; margin-bottom: 10px;">
                 <h3 style="font-size: 15px; margin:0;">👥 Friends & Chat</h3>
                 <button id="close-friends-modal" style="width: auto; padding: 2px 8px; background: #ff4757; font-size: 11px; margin:0;">X</button>
             </div>
 
-            <!-- Tabs -->
             <div style="display: flex; gap: 5px; margin-bottom: 15px;">
                 <button id="tab-find" style="padding: 6px; font-size: 11px; margin:0; background:#007bff;">Find Friend</button>
                 <button id="tab-req" style="padding: 6px; font-size: 11px; margin:0; background:#555;">Requests</button>
                 <button id="tab-list" style="padding: 6px; font-size: 11px; margin:0; background:#555;">My Friends</button>
             </div>
 
-            <!-- Tab 1: Find Friend -->
             <div id="section-find" style="display: block;">
                 <input type="text" id="search-username" placeholder="Search exact username..." style="font-size: 12px; padding: 8px;">
                 <button id="search-btn" style="padding: 8px; font-size: 12px; background: #1db954;">Search</button>
                 <div id="search-result" style="margin-top: 10px;"></div>
             </div>
 
-            <!-- Tab 2: Requests (Accept / Deny) -->
             <div id="section-req" style="display: none;">
                 <h4 style="font-size: 12px; margin-bottom: 8px;">Pending Requests:</h4>
                 <div id="requests-list">No pending requests.</div>
             </div>
 
-            <!-- Tab 3: My Friends & Chat -->
             <div id="section-list" style="display: none;">
-                <h4 style="font-size: 12px; margin-bottom: 8px;">Your Friends (Click to Chat):</h4>
+                <h4 style="font-size: 12px; margin-bottom: 8px;">Your Friends:</h4>
                 <div id="my-friends-list">No friends added yet.</div>
             </div>
 
-            <!-- Private Chat Box (Opens when clicking a friend) -->
             <div id="private-chat-box" style="display: none; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 10px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
                     <span id="chatting-with-name" style="font-size: 13px; font-weight: bold; color: #1db954;">Chat</span>
@@ -97,13 +92,24 @@
                 <p id="main-bio" style="font-size: 12px; color: #ddd; margin-top: 3px;"></p>
             </div>
 
-            <!-- Music Playlist Container -->
-            <div id="music-playlist-container" style="background: rgba(0,0,0,0.6); padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2); margin-bottom: 15px;">
-                <h4 style="font-size: 13px; margin-bottom: 8px; color: #1db954;">🎵 Music Playlist</h4>
+            <!-- 1. Dedicated Play Music Section (Independent) -->
+            <div class="music-container" id="main-play-box" style="display: none; background: rgba(0,0,0,0.7); padding: 12px 15px; border-radius: 50px; display: flex; align-items: center; gap: 12px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.2);">
+                <button id="play-pause-btn" class="play-pause-btn" style="background: #1db954; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 16px; cursor: pointer;">▶</button>
+                <div class="song-info-box" style="text-align: left; flex-grow: 1;">
+                    <div class="song-name-text" id="display-song-name" style="font-size: 13px; font-weight: bold; color: white;">Play Music</div>
+                    <div style="font-size: 10px; color: #aaa;">Click to play/preview</div>
+                </div>
+            </div>
+            <div id="embedded-player-container"></div>
+
+            <!-- 2. Separate Music Playlist Container (Rounded Rectangle Box) -->
+            <div id="music-playlist-container" style="display: none; background: rgba(0,0,0,0.65); padding: 12px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.2); margin-bottom: 15px;">
+                <h4 style="font-size: 13px; margin-bottom: 8px; color: #1db954;">📑 Music Playlists</h4>
                 <div id="playlist-tracks" style="display: flex; flex-direction: column; gap: 8px;"></div>
             </div>
 
-            <div id="social-buttons-container" style="display: flex; justify-content: center; gap: 10px; margin-bottom: 10px;"></div>
+            <!-- Social Media Buttons Container -->
+            <div id="social-buttons-container" style="display: none; justify-content: center; gap: 10px; margin-bottom: 10px;"></div>
 
             <div style="font-size: 11px; color: #aaa; background: rgba(0,0,0,0.4); padding: 4px 10px; border-radius: 10px; display: inline-block;">
                 👁️ Views: <span id="views-count">0</span>
@@ -121,3 +127,4 @@
     <script type="module" src="js/auth.js"></script>
 </body>
 </html>
+
