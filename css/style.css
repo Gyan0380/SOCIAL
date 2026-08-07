@@ -1,52 +1,33 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: 'Segoe UI', sans-serif; color: white; overflow-x: hidden; background-color: black; }
 
-/* Video Backgrounds */
-.bg-video {
-    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: cover; z-index: -1;
-}
-.bg-video-blur {
-    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: cover; z-index: -1;
-    filter: blur(12px) brightness(0.6); transform: scale(1.05);
-}
+.bg-video { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: cover; z-index: -1; }
+.bg-video-blur { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: cover; z-index: -1; filter: blur(12px) brightness(0.6); transform: scale(1.05); }
 
-/* Containers & Glass Box */
-.container {
-    position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; 
-    justify-content: center; min-height: 100vh; background: rgba(0, 0, 0, 0.4); padding: 20px;
-}
-.glass-box {
-    background: rgba(255, 255, 255, 0.1); padding: 30px; border-radius: 15px;
-    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-    text-align: center; width: 100%; max-width: 400px;
-    border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
-}
+.container { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; background: rgba(0, 0, 0, 0.4); padding: 20px; }
+.glass-box { background: rgba(255, 255, 255, 0.1); padding: 30px; border-radius: 15px; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); text-align: center; width: 100%; max-width: 400px; border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5); }
 
-/* Inputs & Buttons */
-input, textarea, select {
-    width: 100%; padding: 12px; margin: 8px 0; border-radius: 5px; border: none; outline: none;
-    background: rgba(255, 255, 255, 0.9); font-family: inherit;
-}
-button {
-    width: 100%; padding: 12px; margin: 10px 0; background: #007bff; color: white;
-    border: none; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s;
-}
+input, textarea, select { width: 100%; padding: 12px; margin: 8px 0; border-radius: 5px; border: none; outline: none; background: rgba(255, 255, 255, 0.9); font-family: inherit; }
+button { width: 100%; padding: 12px; margin: 10px 0; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; }
 button:hover { background: #0056b3; }
-.btn-gold { background: gold; color: black; }
-.btn-gold:hover { background: #d4af37; }
+.btn-gold { background: gold; color: black; } .btn-gold:hover { background: #d4af37; }
 
-/* Corners & Watermark */
-.top-corner {
-    position: absolute; top: 20px; right: 20px; z-index: 2; background: rgba(0, 0, 0, 0.6);
-    padding: 10px 20px; border-radius: 8px; font-weight: bold; backdrop-filter: blur(5px);
-}
-.sound-toggle-btn {
-    position: absolute; bottom: 20px; left: 20px; z-index: 10; background: rgba(0, 0, 0, 0.6);
-    color: white; border: 1px solid rgba(255, 255, 255, 0.3); padding: 8px 15px; 
-    border-radius: 20px; cursor: pointer; width: auto; font-weight: bold;
-}
-.creator-watermark {
-    position: absolute; bottom: 10px; right: 15px; z-index: 2; font-size: 10px;
-    color: rgba(255, 255, 255, 0.4); pointer-events: none; letter-spacing: 1px;
-}
-.center-profile { width: 130px; height: 130px; border-radius: 15px; border: 3px solid white; object-fit: cover; margin-bottom: 15px; }
+.sound-toggle-btn { position: absolute; bottom: 20px; left: 20px; z-index: 10; background: rgba(0, 0, 0, 0.6); color: white; border: 1px solid rgba(255, 255, 255, 0.3); padding: 8px 15px; border-radius: 20px; cursor: pointer; width: auto; font-weight: bold; }
+.creator-watermark { position: absolute; bottom: 10px; right: 15px; z-index: 2; font-size: 10px; color: rgba(255, 255, 255, 0.4); pointer-events: none; letter-spacing: 1px; }
+
+/* Top Nav & Notifications */
+.top-nav { position: absolute; top: 20px; right: 20px; z-index: 10; display: flex; align-items: center; gap: 15px; }
+.noti-bell { font-size: 24px; cursor: pointer; position: relative; }
+.noti-badge { position: absolute; top: -5px; right: -5px; background: red; color: white; font-size: 10px; padding: 2px 5px; border-radius: 50%; font-weight: bold; }
+
+/* Separated Music Player (Spotify Style) */
+.music-container { background: rgba(0, 0, 0, 0.7); padding: 15px 20px; border-radius: 50px; display: flex; align-items: center; gap: 15px; margin-top: 15px; border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 4px 15px rgba(0,0,0,0.5); width: 100%; }
+.play-pause-btn { background: #1db954; color: white; border: none; border-radius: 50%; width: 45px; height: 45px; font-size: 18px; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.3s; margin: 0; padding: 0; }
+.play-pause-btn:hover { transform: scale(1.1); }
+.song-info-box { display: flex; flex-direction: column; flex-grow: 1; text-align: left; }
+.song-name-text { font-size: 14px; font-weight: bold; margin-bottom: 5px; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; }
+
+/* Waveform Progress */
+.waveform-progress { width: 100%; height: 10px; background: rgba(255, 255, 255, 0.2); border-radius: 5px; overflow: hidden; position: relative; background-image: repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(255,255,255,0.1) 2px, rgba(255,255,255,0.1) 4px); }
+.waveform-fill { height: 100%; width: 0%; background: #1db954; background-image: repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(255,255,255,0.9) 2px, rgba(255,255,255,0.9) 4px); transition: width 1s linear; }
+.music-time { font-size: 10px; color: #ccc; margin-top: 3px; display: flex; justify-content: space-between; }
