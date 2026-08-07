@@ -76,37 +76,107 @@ async function loadProfileData(targetUid) {
         const data = snapshot.val();
         
         document.getElementById('main-username').innerText = (data.isPremium ? "⭐ @" : "@") + (data.username || "user");
-        if(data.fullname || data.bio) document.getElementById('main-bio').innerText = (data.fullname || "") + " | " + (data.bio || "");
+        if(document.getElementById('main-bio')) {
+            document.getElementById('main-bio').innerText = (data.fullname || "") + (data.bio ? " | " + data.bio : "");
+        }
         
         if (data.profilePhoto) {
             document.getElementById('main-profile-img').src = data.profilePhoto;
             if(document.getElementById('corner-img')) document.getElementById('corner-img').src = data.profilePhoto;
         }
         
-        const playlistContainer = document.getElementById('playlist-tracks');
-        playlistContainer.innerHTML = "";
-        const songs = [data.music1, data.music2, data.music3].filter(Boolean);
-        if(songs.length === 0) {
-            playlistContainer.innerHTML = "<span style='font-size:11px; color:#aaa;'>No songs added</span>";
+        // 1. Main Play Button Setup
+        const mainPlayBox = document.getElementById('main-play-box');
+        window.mainMusicLink = data.mainMusicLink || null;
+        if (window.mainMusicLink) {
+            mainPlayBox.style.display = 'flex';
         } else {
+            mainPlayBox.style.display = 'none';
+        }
+
+        // 2. Playlists Setup (Playlist 1, 2, 3)
+        const playlistBox = document.getElementById('music-playlist-container');
+        const playlistContainer = document.getElementById('playlist-tracks');
+        const songs = [data.music1, data.music2, data.music3].filter(link => link && link.trim() !== "");
+        
+        if(songs.length > 0) {
+            playlistBox.style.display = 'block';
+            playlistContainer.innerHTML = "";
             songs.forEach((link, idx) => {
                 let isSpotify = link.includes("spotify.com");
-                let btnText = isSpotify ? `🟢 Play Song ${idx+1} on Spotify` : `▶ Play Song ${idx+1} (YouTube)`;
-                playlistContainer.innerHTML += `<a href="${link}" target="_blank" style="display:block; background: ${isSpotify ? '#1db954' : '#ff0000'}; color:white; padding:8px 12px; border-radius:8px; font-size:12px; text-decoration:none; font-weight:bold; text-align:center;">${btnText}</a>`;
+                let isYouTube = link.includes("youtube.com") || link.includes("youtu.be");
+                let platformName = `Playlist ${idx+1}`;
+                let btnColor = "#555";
+                
+                if (isSpotify) {
+                    platformName = `Spotify Playlist ${idx+1}`;
+                    btnColor = "#1db954";
+                } else if (isYouTube) {
+                    platformName = `YouTube Playlist ${idx+1}`;
+                    btnColor = "#ff0000";
+                }
+
+                playlistContainer.innerHTML += `<a href="${link}" target="_blank" style="display:block; background: ${btnColor}; color:white; padding:8px 12px; border-radius:10px; font-size:12px; text-decoration:none; font-weight:bold; text-align:center;">▶ ${platformName}</a>`;
             });
+        } else {
+            playlistBox.style.display = 'none';
         }
         
+        // 3. Social Handles Setup
         const socialContainer = document.getElementById('social-buttons-container');
         socialContainer.innerHTML = "";
-        if (data.instaLink) {
+        let hasSocials = false;
+
+        if (data.instaLink && data.instaLink.trim() !== "") {
+            hasSocials = true;
             socialContainer.innerHTML += `<a href="https://instagram.com/${data.instaLink}" target="_blank" style="background: #e1306c; color: white; padding: 6px 12px; border-radius: 12px; font-size: 11px; text-decoration: none; font-weight: bold;">Instagram</a>`;
         }
-        if (data.ytLink) {
+        if (data.ytLink && data.ytLink.trim() !== "") {
+            hasSocials = true;
             socialContainer.innerHTML += `<a href="${data.ytLink}" target="_blank" style="background: #ff0000; color: white; padding: 6px 12px; border-radius: 12px; font-size: 11px; text-decoration: none; font-weight: bold;">YouTube</a>`;
         }
-        
+
+        socialContainer.style.display = hasSocials ? 'flex' : 'none';
         loadViewsCount(targetUid);
     }
+}
+
+// Independent Play Button Logic (30s Spotify / Full YouTube)
+const playBtn = document.getElementById('play-pause-btn');
+const embedContainer = document.getElementById('embedded-player-container');
+let isPlaying = false;
+
+if (playBtn) {
+    playBtn.addEventListener('click', () => {
+        if (!window.mainMusicLink) return;
+
+        let link = window.mainMusicLink;
+        embedContainer.innerHTML = "";
+
+        if (!isPlaying) {
+            playBtn.innerText = "⏸";
+            isPlaying = true;
+
+            if (link.includes("youtube.com") || link.includes("youtu.be")) {
+                let videoId = link.includes('v=') ? link.split('v=')[1].split('&')[0] : link.split('youtu.be/')[1].split('?')[0];
+                embedContainer.innerHTML = `<iframe width="0" height="0" src="https://www.youtube.com/embed/${videoId}?autoplay=1" frameborder="0" allow="autoplay"></iframe>`;
+            } 
+            else if (link.includes("spotify.com")) {
+                let trackId = link.split('track/')[1].split('?')[0];
+                embedContainer.innerHTML = `<iframe style="border-radius:12px; margin-top:5px;" src="https://open.spotify.com/embed/track/${trackId}?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allow="autoplay"></iframe>`;
+                
+                setTimeout(() => {
+                    embedContainer.innerHTML = "";
+                    playBtn.innerText = "▶";
+                    isPlaying = false;
+                }, 30000);
+            }
+        } else {
+            playBtn.innerText = "▶";
+            isPlaying = false;
+            embedContainer.innerHTML = "";
+        }
+    });
 }
 
 async function incrementViews(targetUid) {
@@ -151,17 +221,19 @@ if (cornerImg && dropdownMenu) {
     });
 }
 
-// -----------------------------------------------------
-// FRIENDS SYSTEM & PRIVATE CHAT LOGIC (FIXED)
-// -----------------------------------------------------
+// Friends & Private Chat Logic
 const friendsModal = document.getElementById('friends-modal');
-document.getElementById('open-friends-menu').addEventListener('click', () => {
-    friendsModal.style.display = 'block';
-    dropdownMenu.style.display = 'none';
-});
-document.getElementById('close-friends-modal').addEventListener('click', () => {
-    friendsModal.style.display = 'none';
-});
+if(document.getElementById('open-friends-menu')) {
+    document.getElementById('open-friends-menu').addEventListener('click', () => {
+        friendsModal.style.display = 'block';
+        dropdownMenu.style.display = 'none';
+    });
+}
+if(document.getElementById('close-friends-modal')) {
+    document.getElementById('close-friends-modal').addEventListener('click', () => {
+        friendsModal.style.display = 'none';
+    });
+}
 
 const tabFind = document.getElementById('tab-find');
 const tabReq = document.getElementById('tab-req');
@@ -170,46 +242,51 @@ const secFind = document.getElementById('section-find');
 const secReq = document.getElementById('section-req');
 const secList = document.getElementById('section-list');
 
-tabFind.addEventListener('click', () => {
-    secFind.style.display = 'block'; secReq.style.display = 'none'; secList.style.display = 'none';
-    tabFind.style.background = '#007bff'; tabReq.style.background = '#555'; tabList.style.background = '#555';
-});
-tabReq.addEventListener('click', () => {
-    secFind.style.display = 'none'; secReq.style.display = 'block'; secList.style.display = 'none';
-    tabReq.style.background = '#007bff'; tabFind.style.background = '#555'; tabList.style.background = '#555';
-});
-tabList.addEventListener('click', () => {
-    secFind.style.display = 'none'; secReq.style.display = 'none'; secList.style.display = 'block';
-    tabList.style.background = '#007bff'; tabFind.style.background = '#555'; tabReq.style.background = '#555';
-});
+if(tabFind) {
+    tabFind.addEventListener('click', () => {
+        secFind.style.display = 'block'; secReq.style.display = 'none'; secList.style.display = 'none';
+        tabFind.style.background = '#007bff'; tabReq.style.background = '#555'; tabList.style.background = '#555';
+    });
+    tabReq.addEventListener('click', () => {
+        secFind.style.display = 'none'; secReq.style.display = 'block'; secList.style.display = 'none';
+        tabReq.style.background = '#007bff'; tabFind.style.background = '#555'; tabList.style.background = '#555';
+    });
+    tabList.addEventListener('click', () => {
+        secFind.style.display = 'none'; secReq.style.display = 'none'; secList.style.display = 'block';
+        tabList.style.background = '#007bff'; tabFind.style.background = '#555'; tabReq.style.background = '#555';
+    });
+}
 
-document.getElementById('search-btn').addEventListener('click', async () => {
-    const q = document.getElementById('search-username').value.trim();
-    const res = document.getElementById('search-result');
-    if(!q) return;
-    res.innerHTML = "Searching...";
+const searchBtn = document.getElementById('search-btn');
+if(searchBtn) {
+    searchBtn.addEventListener('click', async () => {
+        const q = document.getElementById('search-username').value.trim();
+        const res = document.getElementById('search-result');
+        if(!q) return;
+        res.innerHTML = "Searching...";
 
-    const uRef = await get(child(ref(db), `usernames/${q}`));
-    if(uRef.exists()) {
-        const fUid = uRef.val();
-        if(fUid === auth.currentUser.uid) {
-            res.innerHTML = "<span style='color:orange; font-size:11px;'>This is your own username!</span>";
-            return;
+        const uRef = await get(child(ref(db), `usernames/${q}`));
+        if(uRef.exists()) {
+            const fUid = uRef.val();
+            if(fUid === auth.currentUser.uid) {
+                res.innerHTML = "<span style='color:orange; font-size:11px;'>This is your own username!</span>";
+                return;
+            }
+            const fSnap = await get(child(ref(db), `users/${fUid}`));
+            if(fSnap.exists()) {
+                const fd = fSnap.val();
+                res.innerHTML = `
+                    <div style="background:rgba(255,255,255,0.1); padding:8px; border-radius:6px; display:flex; justify-content:space-between; align-items:center; margin-top:5px;">
+                        <span style="font-size:12px;">@${fd.username}</span>
+                        <button onclick="sendFriendReq('${fUid}')" style="width:auto; padding:4px 8px; font-size:10px; background:#1db954; margin:0;">Add Friend</button>
+                    </div>
+                `;
+            }
+        } else {
+            res.innerHTML = "<span style='color:#ff4757; font-size:11px;'>User not found!</span>";
         }
-        const fSnap = await get(child(ref(db), `users/${fUid}`));
-        if(fSnap.exists()) {
-            const fd = fSnap.val();
-            res.innerHTML = `
-                <div style="background:rgba(255,255,255,0.1); padding:8px; border-radius:6px; display:flex; justify-content:space-between; align-items:center; margin-top:5px;">
-                    <span style="font-size:12px;">@${fd.username}</span>
-                    <button onclick="sendFriendReq('${fUid}')" style="width:auto; padding:4px 8px; font-size:10px; background:#1db954; margin:0;">Add Friend</button>
-                </div>
-            `;
-        }
-    } else {
-        res.innerHTML = "<span style='color:#ff4757; font-size:11px;'>User not found!</span>";
-    }
-});
+    });
+}
 
 window.sendFriendReq = async function(targetUid) {
     const myUid = auth.currentUser.uid;
@@ -219,6 +296,7 @@ window.sendFriendReq = async function(targetUid) {
 
 async function loadFriendRequests(myUid) {
     const reqDiv = document.getElementById('requests-list');
+    if(!reqDiv) return;
     const snap = await get(child(ref(db), `users/${myUid}/friendRequests`));
     if(snap.exists()) {
         reqDiv.innerHTML = "";
@@ -261,6 +339,7 @@ window.denyReq = async function(senderUid) {
 
 async function loadMyFriends(myUid) {
     const listDiv = document.getElementById('my-friends-list');
+    if(!listDiv) return;
     const snap = await get(child(ref(db), `users/${myUid}/friends`));
     if(snap.exists()) {
         listDiv.innerHTML = "";
@@ -293,12 +372,10 @@ window.openChat = function(friendUid, friendName) {
     const msgContainer = document.getElementById('chat-messages');
     msgContainer.innerHTML = "";
     
-    // Purana listener hatao taaki doosre friend ke messages mix na hon
     if (currentChatListener) {
         off(currentChatListener);
     }
 
-    // Har do doston ka ek alag unique room banta hai
     activeChatRoom = myUid < friendUid ? `${myUid}_${friendUid}` : `${friendUid}_${myUid}`;
     
     currentChatListener = ref(db, `private_chats/${activeChatRoom}`);
@@ -321,27 +398,33 @@ window.openChat = function(friendUid, friendName) {
     });
 };
 
-document.getElementById('close-chat-box').addEventListener('click', () => {
-    document.getElementById('private-chat-box').style.display = 'none';
-    if (currentChatListener) off(currentChatListener);
-    activeChatRoom = null;
-});
-
-document.getElementById('send-chat-btn').addEventListener('click', async () => {
-    const input = document.getElementById('chat-input');
-    const text = input.value.trim();
-    if(!text || !activeChatRoom) return;
-
-    const user = auth.currentUser;
-    const msgRef = push(ref(db, `private_chats/${activeChatRoom}`));
-    
-    const userSnap = await get(child(ref(db), `users/${user.uid}/username`));
-    const username = userSnap.exists() ? userSnap.val() : "user";
-
-    await set(msgRef, {
-        sender: username,
-        message: text,
-        timestamp: Date.now()
+const closeChatBox = document.getElementById('close-chat-box');
+if(closeChatBox) {
+    closeChatBox.addEventListener('click', () => {
+        document.getElementById('private-chat-box').style.display = 'none';
+        if (currentChatListener) off(currentChatListener);
+        activeChatRoom = null;
     });
-    input.value = "";
-});
+}
+
+const sendChatBtn = document.getElementById('send-chat-btn');
+if(sendChatBtn) {
+    sendChatBtn.addEventListener('click', async () => {
+        const input = document.getElementById('chat-input');
+        const text = input.value.trim();
+        if(!text || !activeChatRoom) return;
+
+        const user = auth.currentUser;
+        const msgRef = push(ref(db, `private_chats/${activeChatRoom}`));
+        
+        const userSnap = await get(child(ref(db), `users/${user.uid}/username`));
+        const username = userSnap.exists() ? userSnap.val() : "user";
+
+        await set(msgRef, {
+            sender: username,
+            message: text,
+            timestamp: Date.now()
+        });
+        input.value = "";
+    });
+}
