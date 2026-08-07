@@ -7,46 +7,55 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <!-- Background Video -->
-    <video autoplay loop muted class="bg-video">
-        <source src="your-video-link.mp4" type="video/mp4">
+    <!-- Blurred Video Background -->
+    <video autoplay loop muted id="profile-bg-video" class="bg-video-blur">
+        <source src="anime-video.mp4" type="video/mp4">
     </video>
 
     <div class="container">
-        <div class="glass-box" style="width: 400px; max-height: 90vh; overflow-y: auto;">
-            <h2>Account Setup / Edit</h2>
+        <div class="glass-box" style="max-height: 90vh; overflow-y: auto;">
+            <h2>Account Setup</h2>
             
-            <!-- Notifications Section -->
-            <div id="notifications-box" style="background: rgba(255,255,255,0.2); padding: 10px; border-radius: 5px; margin-bottom: 15px; font-size: 12px; display: none;">
-                <strong>Notifications:</strong>
-                <ul id="noti-list" style="list-style: none; padding-top: 5px; text-align: left;"></ul>
+            <!-- Notifications Box -->
+            <div id="notifications-box" style="background: rgba(255,255,255,0.2); padding: 10px; border-radius: 5px; margin: 15px 0; text-align: left; display: none;">
+                <strong>🔔 Notifications:</strong>
+                <ul id="noti-list" style="list-style: none; padding-top: 5px; font-size: 13px;"></ul>
             </div>
 
-            <div id="profile-form">
-                <!-- Profile Picture Upload -->
-                <img id="preview-img" src="default-profile.png" class="center-profile" style="width: 100px; height: 100px;">
-                <input type="file" id="profile-upload" accept="image/*">
-                
-                <input type="text" id="username" placeholder="Choose unique username (e.g. gyan123)" required>
-                <input type="text" id="fullname" placeholder="Full Name">
-                <input type="text" id="bio" placeholder="Bio">
-                
-                <hr style="margin: 15px 0; border-color: rgba(255,255,255,0.2);">
-                <p style="font-size: 14px;">Social Links & Music</p>
-                <input type="text" id="ig-link" placeholder="Instagram URL">
-                <input type="text" id="fb-link" placeholder="Facebook URL">
-                <input type="text" id="yt-link" placeholder="YouTube/Spotify Song Link">
-                
-                <button id="save-profile-btn">Save Profile</button>
-                <button onclick="window.location.href='index.html'" style="background: #555;">Back to Home</button>
+            <!-- Profile Data -->
+            <img id="preview-img" src="default-profile.png" class="center-profile" style="width: 100px; height: 100px;">
+            <input type="file" id="profile-upload" accept="image/*">
+            <input type="text" id="username" placeholder="Choose unique username (e.g. gyan123)">
+            <input type="text" id="fullname" placeholder="Full Name">
+            <input type="text" id="bio" placeholder="Bio">
+            
+            <hr style="margin: 15px 0; border-color: rgba(255,255,255,0.2);">
+            
+            <!-- Get Premium Section (UPI) -->
+            <div style="background: rgba(0, 0, 0, 0.5); padding: 15px; border-radius: 8px; border: 1px solid #4da3ff;">
+                <h3 style="color: #4da3ff; margin-bottom: 5px;">👑 Buy Premium</h3>
+                <p style="font-size: 12px; margin-bottom: 10px;">Get Custom Backgrounds & Badge (20 Days - ₹30)</p>
+                <p style="font-size: 13px;">UPI ID: <strong>your-upi-id@ybl</strong></p>
+                <input type="text" id="upi-input" placeholder="Enter your Sender Name / UPI ID">
+                <button id="submit-upi-btn" class="btn-gold">Submit Payment Request</button>
             </div>
+
+            <!-- Premium Background Settings (Hidden for Free Users) -->
+            <div id="premium-settings" style="display: none; background: rgba(255, 215, 0, 0.2); padding: 15px; border-radius: 8px; border: 1px solid gold; margin-top: 15px;">
+                <h3 style="color: gold; margin-bottom: 10px;">⭐ Premium Custom BG</h3>
+                <label style="font-size: 13px;">Upload Photo Background:</label>
+                <input type="file" id="custom-bg-upload" accept="image/*">
+                <p style="font-size: 12px; margin: 5px 0;">OR</p>
+                <label style="font-size: 13px;">Video Link (URL):</label>
+                <input type="text" id="custom-bg-url" placeholder="https://example.com/video.mp4">
+            </div>
+
+            <button id="save-profile-btn" style="margin-top: 20px;">Save Profile</button>
+            <button onclick="window.location.href='index.html'" style="background: #555;">Back to Home</button>
         </div>
     </div>
-
-    <div class="creator-watermark">web created by GYAN GUPTA</div>
 
     <script type="module" src="js/firebase.js"></script>
     <script type="module" src="js/app.js"></script>
 </body>
 </html>
-
