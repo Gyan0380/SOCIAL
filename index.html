@@ -21,6 +21,8 @@
             <div id="dropdown-menu" style="display: none; position: absolute; top: 50px; right: 0; background: rgba(0,0,0,0.9); padding: 10px; border-radius: 8px; width: 150px; border: 1px solid rgba(255,255,255,0.2);">
                 <button onclick="window.location.href='profile.html'" style="padding: 6px; font-size: 12px; margin-bottom: 5px;">✏️ Edit Profile</button>
                 <button id="open-friends-menu" style="background: #1e90ff; padding: 6px; font-size: 12px; margin-bottom: 5px;">👥 Friends Menu</button>
+                <!-- NEW GAMES BUTTON ADDED HERE -->
+                <button id="open-games-modal" style="background: #9b59b6; padding: 6px; font-size: 12px; margin-bottom: 5px;">🎮 Games</button>
                 <button onclick="window.location.href='admin.html'" style="background: #f39c12; padding: 6px; font-size: 12px; margin-bottom: 5px;">⚙️ Admin</button>
                 <button id="logout-btn" style="background: #ff4757; padding: 6px; font-size: 12px;">🚪 Logout</button>
             </div>
@@ -84,6 +86,27 @@
             </div>
         </div>
 
+        <!-- NEW GAMES MODAL ADDED HERE -->
+        <div id="games-modal" class="glass-box" style="display: none; position: absolute; top: 70px; width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto; z-index: 60; text-align: left;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px; margin-bottom: 10px;">
+                <h3 style="font-size: 15px; margin:0;">🧠 Code Guess Game</h3>
+                <button id="close-games-modal" style="width: auto; padding: 2px 8px; background: #ff4757; font-size: 11px; margin:0;">X</button>
+            </div>
+            
+            <label style="font-size: 11px; color:#aaa; margin-bottom: 5px; display: block;">Select Difficulty:</label>
+            <select id="game-difficulty" style="background: rgba(0,0,0,0.5); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 8px; font-size: 12px; border-radius: 8px; margin-bottom: 10px; width: 100%;">
+                <option value="easy" style="color: black;">Easy (4 Colors - 7 Guesses)</option>
+                <option value="normal" style="color: black;">Normal (5 Colors - 12 Guesses)</option>
+                <option value="hard" style="color: black;">Hard (6 Colors - 15 Guesses)</option>
+            </select>
+            
+            <button id="start-game-btn" style="background: #1db954; font-size: 12px; padding: 8px;">Start Game</button>
+            
+            <div id="game-area" style="margin-top: 15px; display: none;">
+                <!-- Game elements will be injected here by game.js -->
+            </div>
+        </div>
+
         <!-- Main Profile Screen -->
         <div id="main-screen" style="display: none; width: 100%; max-width: 400px; text-align: center;">
             <div style="margin-bottom: 15px;">
@@ -125,6 +148,8 @@
 
     <script type="module" src="js/firebase.js"></script>
     <script type="module" src="js/auth.js"></script>
+    
+    <!-- NEW GAMES SCRIPT -->
+    <script src="js/game.js"></script>
 </body>
 </html>
-
