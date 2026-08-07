@@ -49,12 +49,39 @@
                 <h3 style="font-size: 15px; margin:0;">👥 Friends & Chat</h3>
                 <button id="close-friends-modal" style="width: auto; padding: 2px 8px; background: #ff4757; font-size: 11px; margin:0;">X</button>
             </div>
-            <!-- (Friends code remains same as before...) -->
-            <button id="close-chat-box" style="display:none;"></button>
+            <div style="display: flex; gap: 5px; margin-bottom: 15px;">
+                <button id="tab-find" style="padding: 6px; font-size: 11px; margin:0; background:#007bff;">Find Friend</button>
+                <button id="tab-req" style="padding: 6px; font-size: 11px; margin:0; background:#555;">Requests</button>
+                <button id="tab-list" style="padding: 6px; font-size: 11px; margin:0; background:#555;">My Friends</button>
+            </div>
+            <div id="section-find" style="display: block;">
+                <input type="text" id="search-username" placeholder="Search exact username..." style="font-size: 12px; padding: 8px;">
+                <button id="search-btn" style="padding: 8px; font-size: 12px; background: #1db954;">Search</button>
+                <div id="search-result" style="margin-top: 10px;"></div>
+            </div>
+            <div id="section-req" style="display: none;">
+                <h4 style="font-size: 12px; margin-bottom: 8px;">Pending Requests:</h4>
+                <div id="requests-list">No pending requests.</div>
+            </div>
+            <div id="section-list" style="display: none;">
+                <h4 style="font-size: 12px; margin-bottom: 8px;">Your Friends:</h4>
+                <div id="my-friends-list">No friends added yet.</div>
+            </div>
+            <div id="private-chat-box" style="display: none; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 10px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                    <span id="chatting-with-name" style="font-size: 13px; font-weight: bold; color: #1db954;">Chat</span>
+                    <button id="close-chat-box" style="width: auto; padding: 2px 6px; font-size: 10px; background: #555; margin:0;">Back</button>
+                </div>
+                <div id="chat-messages" style="height: 150px; overflow-y: auto; background: rgba(0,0,0,0.4); padding: 8px; border-radius: 6px; font-size: 11px; display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px;"></div>
+                <div style="display: flex; gap: 5px;">
+                    <input type="text" id="chat-input" placeholder="Type message (Auto-deletes in 3m)..." style="margin:0; padding:6px; font-size:11px;">
+                    <button id="send-chat-btn" style="width: 60px; margin:0; padding:6px; font-size:11px; background:#1db954;">Send</button>
+                </div>
+            </div>
         </div>
 
         <!-- ======================================= -->
-        <!-- 1. GAMES HUB MODAL (MAIN MENU + LEADERBOARD) -->
+        <!-- 1. GAMES HUB MODAL -->
         <!-- ======================================= -->
         <div id="games-hub-modal" class="glass-box" style="display: none; position: absolute; top: 70px; width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto; z-index: 60; text-align: left;">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px; margin-bottom: 10px;">
@@ -62,44 +89,41 @@
                 <button id="close-games-hub" style="width: auto; padding: 2px 8px; background: #ff4757; font-size: 11px; margin:0;">X</button>
             </div>
             
-            <!-- TABS -->
             <div style="display: flex; gap: 5px; margin-bottom: 15px;">
                 <button id="tab-play-games" style="padding: 8px; font-size: 12px; margin:0; background:#9b59b6;">Play Games</button>
                 <button id="tab-leaderboard" style="padding: 8px; font-size: 12px; margin:0; background:#555;">🏆 Leaderboard</button>
             </div>
             
-            <!-- PLAY GAMES SECTION -->
             <div id="sec-play-games" style="display: block;">
                 <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <!-- Code Guess Button -->
                     <button id="btn-open-code-guess" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); padding: 10px; border-radius: 12px; display: flex; align-items: center; gap: 12px; text-align: left;">
                         <span style="font-size: 24px;">🧠</span> 
                         <div style="flex-grow: 1;">
                             <div style="font-size: 14px; font-weight: bold; color: #1db954;">Code Guess</div>
-                            <div style="font-size: 10px; color: #ddd; font-weight: normal; line-height: 1.2;">Crack the secret code! Earn Points.</div>
+                            <div style="font-size: 10px; color: #ddd; font-weight: normal; line-height: 1.2;">Crack the secret code!</div>
                         </div>
                     </button>
                     
-                    <button disabled style="background: rgba(0,0,0,0.4); border: 1px dashed rgba(255,255,255,0.2); padding: 10px; border-radius: 12px; display: flex; align-items: center; gap: 12px; text-align: left; opacity: 0.6; cursor: not-allowed;">
-                        <span style="font-size: 24px;">🚧</span> 
+                    <!-- NEW: Memory Match Button -->
+                    <button id="btn-open-memory-match" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); padding: 10px; border-radius: 12px; display: flex; align-items: center; gap: 12px; text-align: left;">
+                        <span style="font-size: 24px;">🃏</span> 
                         <div style="flex-grow: 1;">
-                            <div style="font-size: 14px; font-weight: bold; color: #aaa;">Coming Soon...</div>
-                            <div style="font-size: 10px; color: #888; font-weight: normal; line-height: 1.2;">More games in next update</div>
+                            <div style="font-size: 14px; font-weight: bold; color: #ffeb3b;">Memory Match</div>
+                            <div style="font-size: 10px; color: #ddd; font-weight: normal; line-height: 1.2;">Flip cards and match pairs!</div>
                         </div>
                     </button>
                 </div>
             </div>
 
-            <!-- LEADERBOARD SECTION -->
             <div id="sec-leaderboard" style="display: none;">
                 <label style="font-size: 11px; color:#aaa; margin-bottom: 5px; display: block;">Select Game Leaderboard:</label>
                 <select id="lb-game-select" style="background: rgba(0,0,0,0.5); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 8px; font-size: 12px; border-radius: 8px; margin-bottom: 15px; width: 100%;">
                     <option value="codeGuess" style="color: black;">🧠 Code Guess</option>
+                    <option value="memoryMatch" style="color: black;">🃏 Memory Match</option>
                 </select>
                 
-                <div id="leaderboard-list" style="display: flex; flex-direction: column; gap: 8px; min-height: 150px;">
-                    <!-- Top 10 players will appear here -->
-                    <div style="text-align: center; color: #aaa; font-size: 12px; margin-top: 20px;">Loading ranks...</div>
-                </div>
+                <div id="leaderboard-list" style="display: flex; flex-direction: column; gap: 8px; min-height: 150px;"></div>
             </div>
         </div>
 
@@ -109,28 +133,24 @@
         <div id="code-guess-modal" class="glass-box" style="display: none; position: absolute; top: 70px; width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto; z-index: 61; text-align: left;">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px; margin-bottom: 10px;">
                 <h3 style="font-size: 15px; margin:0;">🧠 Code Guess</h3>
-                <button id="back-to-hub" style="width: auto; padding: 2px 8px; background: #555; font-size: 11px; margin:0;">Back</button>
+                <button id="back-to-hub-cg" style="width: auto; padding: 2px 8px; background: #555; font-size: 11px; margin:0;">Back</button>
             </div>
-            
             <div id="cg-setup">
                 <label style="font-size: 11px; color:#aaa; margin-bottom: 5px; display: block;">Select Difficulty (Win Points):</label>
                 <select id="cg-difficulty" style="background: rgba(0,0,0,0.5); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 8px; font-size: 12px; border-radius: 8px; margin-bottom: 15px; width: 100%;">
-                    <option value="easy" style="color: black;">Easy (4 Colors, 7 Guesses) - 1 Pt</option>
-                    <option value="normal" style="color: black;">Normal (5 Colors, 12 Guesses) - 2 Pts</option>
-                    <option value="hard" style="color: black;">Hard (6 Colors, 15 Guesses) - 5 Pts</option>
+                    <option value="easy" style="color: black;">Easy (4 Colors) - 1 Pt</option>
+                    <option value="normal" style="color: black;">Normal (5 Colors) - 2 Pts</option>
+                    <option value="hard" style="color: black;">Hard (6 Colors) - 5 Pts</option>
                 </select>
                 <button id="cg-start-btn" style="background: #1db954; font-size: 12px; padding: 10px;">Start Game</button>
             </div>
-            
             <div id="cg-game-area" style="display: none; margin-top: 10px;">
                 <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 10px; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">
                     <span style="color: #ffeb3b;">Guesses left: <strong id="cg-guesses-left" style="font-size: 14px;">7</strong></span>
                     <button id="cg-quit-btn" style="width: auto; padding: 2px 8px; background: #ff4757; font-size: 10px; margin:0;">Quit</button>
                 </div>
-                
                 <div style="font-size: 11px; color: #aaa; text-align: center; margin-bottom: 5px;">Tap colors to build your guess:</div>
                 <div id="cg-color-picker" style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 15px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 10px;"></div>
-                
                 <div style="background: rgba(0,0,0,0.5); padding: 10px; border-radius: 10px; text-align: center; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1);">
                     <div style="font-size: 11px; color: #ddd; margin-bottom: 8px;">Your Current Guess:</div>
                     <div id="cg-current-guess" style="display: flex; justify-content: center; gap: 8px; min-height: 25px;"></div>
@@ -139,9 +159,40 @@
                          <button id="cg-submit-btn" style="background: #1e90ff; width: auto; padding: 6px 12px; font-size: 11px; margin: 0; font-weight: bold;">Submit</button>
                     </div>
                 </div>
-                
                 <div style="font-size: 11px; color: #aaa; margin-bottom: 5px;">History:</div>
                 <div id="cg-history" style="max-height: 180px; overflow-y: auto; font-size: 11px; display: flex; flex-direction: column; gap: 5px;"></div>
+            </div>
+        </div>
+
+        <!-- ======================================= -->
+        <!-- 3. MEMORY MATCH GAME MODAL -->
+        <!-- ======================================= -->
+        <div id="memory-match-modal" class="glass-box" style="display: none; position: absolute; top: 70px; width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto; z-index: 61; text-align: left;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px; margin-bottom: 10px;">
+                <h3 style="font-size: 15px; margin:0;">🃏 Memory Match</h3>
+                <button id="back-to-hub-mm" style="width: auto; padding: 2px 8px; background: #555; font-size: 11px; margin:0;">Back</button>
+            </div>
+            
+            <div id="mm-setup">
+                <label style="font-size: 11px; color:#aaa; margin-bottom: 5px; display: block;">Select Difficulty (Win Points):</label>
+                <select id="mm-difficulty" style="background: rgba(0,0,0,0.5); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 8px; font-size: 12px; border-radius: 8px; margin-bottom: 15px; width: 100%;">
+                    <option value="easy" style="color: black;">Easy (12 Cards) - 1 Pt</option>
+                    <option value="normal" style="color: black;">Normal (16 Cards) - 2 Pts</option>
+                    <option value="hard" style="color: black;">Hard (20 Cards) - 5 Pts</option>
+                </select>
+                <button id="mm-start-btn" style="background: #ffeb3b; color: black; font-size: 12px; padding: 10px;">Start Matching!</button>
+            </div>
+            
+            <div id="mm-game-area" style="display: none; margin-top: 10px;">
+                <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 15px; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">
+                    <span style="color: #1db954;">Moves: <strong id="mm-moves-txt" style="font-size: 14px;">0</strong></span>
+                    <button id="mm-quit-btn" style="width: auto; padding: 2px 8px; background: #ff4757; font-size: 10px; margin:0;">Quit</button>
+                </div>
+                
+                <!-- Game Grid -->
+                <div id="mm-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px;">
+                    <!-- Cards injected via JS -->
+                </div>
             </div>
         </div>
 
@@ -171,7 +222,6 @@
             
             <div id="social-buttons-container" style="display: none; justify-content: center; gap: 10px; margin-bottom: 10px;"></div>
 
-            <!-- NEW MAIN PAGE GAMES BUTTON -->
             <button id="main-open-games-btn" style="background: linear-gradient(135deg, #9b59b6, #8e44ad); width: 100%; border-radius: 12px; font-size: 14px; font-weight: bold; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(155, 89, 182, 0.4);">🎮 Games & Leaderboard</button>
 
             <div style="font-size: 11px; color: #aaa; background: rgba(0,0,0,0.4); padding: 4px 10px; border-radius: 10px; display: inline-block;">
@@ -188,8 +238,6 @@
 
     <script type="module" src="js/firebase.js"></script>
     <script type="module" src="js/auth.js"></script>
-    
-    <!-- IMPORTANT: Must be type="module" for Firebase -->
     <script type="module" src="js/game.js"></script>
 </body>
 </html>
