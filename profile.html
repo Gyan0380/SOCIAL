@@ -16,33 +16,21 @@
 
             <img id="preview-img" src="default-profile.png" class="center-profile" style="width: 100px; height: 100px;">
             <input type="file" id="profile-upload" accept="image/*">
-            <input type="text" id="username" placeholder="Choose unique username (e.g. gyan123)">
+            <input type="text" id="username" placeholder="Choose unique username">
             <input type="text" id="fullname" placeholder="Full Name">
             <input type="text" id="bio" placeholder="Bio">
             
             <hr style="margin: 20px 0; border-color: rgba(255,255,255,0.2);">
-            <h3 style="font-size: 14px; margin-bottom: 10px; text-align: left;">🎵 Music & Social Links</h3>
+            <h3 style="font-size: 14px; margin-bottom: 10px; text-align: left;">🎵 Music Playlist (Max 3 Links)</h3>
+            <p style="font-size: 11px; color: #ffeb3b; text-align: left; margin-bottom: 8px;">Paste YouTube or Spotify links. Spotify will have a direct redirect/preview button.</p>
 
-            <div style="text-align: left; margin-bottom: 10px;">
-                <label style="font-size: 12px; color: #aaa;">Song Name</label>
-                <input type="text" id="song-name-input" placeholder="Enter Song Name">
-            </div>
+            <input type="text" id="music-1" placeholder="Song 1 Link (YT / Spotify)">
+            <input type="text" id="music-2" placeholder="Song 2 Link (Optional)">
+            <input type="text" id="music-3" placeholder="Song 3 Link (Optional)">
 
-            <div style="text-align: left; margin-bottom: 5px;">
-                <label style="font-size: 11px; color: #ffeb3b; display: block; line-height: 1.4;">
-                    ℹ️ Music link YouTube / Spotify<br>
-                    • Spotify: Only run 30s music in web.<br>
-                    • YouTube: Run full music.<br>
-                    (Song kitne bhi minute ka ho, web player 30s ya YT full chalega)
-                </label>
-                <input type="text" id="music-link-input" placeholder="Paste Spotify or YouTube Song Link">
-            </div>
-
-            <div style="text-align: left; margin-bottom: 10px;">
-                <label style="font-size: 12px; color: #aaa;">Social Handles (Optional)</label>
-                <input type="text" id="ig-link" placeholder="Instagram Username (e.g. gyan_gupta)">
-                <input type="text" id="yt-link" placeholder="YouTube Channel Link">
-            </div>
+            <h3 style="font-size: 14px; margin: 15px 0 10px 0; text-align: left;">🌐 Social Handles</h3>
+            <input type="text" id="ig-link" placeholder="Instagram Username">
+            <input type="text" id="yt-link" placeholder="YouTube Channel Link">
             
             <button id="save-profile-btn" style="margin-top: 20px;">Save Profile</button>
             <button onclick="window.location.href='index.html'" style="background: #555;">Back to Home</button>
